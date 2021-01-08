@@ -90,19 +90,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'server.wsgi.application'
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.'+config('DB_TYPE'),
         'NAME': config('db_name',None),
         'USER': config('db_user',None),
         'PASSWORD': config('db_password',None),
         'HOST': 'localhost',
         'PORT': '',
     },
-    'test': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
 }
 
 # Covers regular testing and django-coverage and travis-ci
