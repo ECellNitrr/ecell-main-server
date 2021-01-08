@@ -27,7 +27,7 @@ To Setup this Project and contribute follow below guidelines.
 
    `pip install -r requirements.txt`
 
-6. Make a copy of .env.save to .env and change the values of variables with original values.
+6. Make a copy of `.env.save` to `.env` and change the values of variables with original values.
 
 7. Setup MYSQL Database with given credentials
 
