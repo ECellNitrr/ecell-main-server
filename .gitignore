@@ -1,0 +1,31 @@
+#Virtual Environments
+env
+venv
+myenv
+
+#Database
+db.sqlite3
+
+#Cache Files
+**/__pycache__
+.env
+*.pyc
+
+static/uploads/
+debug.log
+
+#Vscode
+.vscode
+
+dumped/
+# */migrations
+
+#these will be collected when running collectstatic
+# static/admin
+# static/css
+# static/js
+# static/media
+# static/rest_framework
+static/uploads/bquiz
+static/uploads/sponsors/Oyo Rooms.jpeg
+celerybeat-schedule
