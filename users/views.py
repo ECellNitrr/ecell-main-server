@@ -16,6 +16,7 @@ from random import randint
 from .models import CustomUser
 import traceback
 
+# TODO: teesco style
 class RegistrationAPIView(APIView):
     authentication_classes = []
     permission_classes = (AllowAny,)
@@ -83,6 +84,7 @@ class RegistrationAPIView(APIView):
                 'id': user_obj.id
             }, status=res_status)
 
+# TODO: teesco style
 class LoginAPIView(APIView):
     authentication_classes = []
     permission_classes = (AllowAny,)
@@ -175,6 +177,8 @@ def forgot_password(request):
             "message": message,
         }, status=res_status)
 
+
+# TODO: make print the otp in the terminal for now. we will integrate once we get a provider
 @api_view(['POST',])
 @ecell_user 
 @client_check
@@ -202,6 +206,8 @@ def verify_otp(request):
             "message": message,
         }, status=res_status)
     
+    
+# TODO: write unittests
 @api_view(['POST'])
 @client_check
 def check_otp(request):
@@ -226,6 +232,8 @@ def check_otp(request):
         "message":message,
         "verified":verified
     }, status=res_status)
+
+
 
 @api_view(['POST'])
 @client_check
@@ -253,6 +261,8 @@ def change_password(request):
             "message": message,
         }, status=res_status)
 
+# TODO: remove all the instance of ecell_user and relaxed_ecell_user with teesco style auth
+# TODO: remove /decorators.py after convertion to teesco style auth 
 @api_view(['GET'])
 @ecell_user
 def resend_otp(request):
@@ -275,6 +285,7 @@ def resend_otp(request):
             "message": message,
         }, status=res_status)
 
+# TODO: remove ecell_user and client_check
 @api_view(['POST'])
 @ecell_user
 @client_check
@@ -294,6 +305,7 @@ def change_contact(request):
             "message": message,
         }, status=res_status)
     
+# TODO: remove ecell_user and client_check and use teesco auth
 @api_view(['GET'])
 @ecell_user
 @client_check
@@ -307,6 +319,7 @@ def is_user_verified(request):
 
 
 
+# TODO: remove ecell_user and client_check and use teesco auth
 @api_view(['GET'])
 @ecell_user
 def request_ca_approval(request):
@@ -321,6 +334,8 @@ def request_ca_approval(request):
         }, status=res_status)
 
 
+
+# TODO: remove ecell_user and client_check and use teesco auth
 @api_view(['GET'])
 @ecell_user
 def get_user_details(request):

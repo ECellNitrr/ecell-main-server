@@ -57,12 +57,3 @@ class NoticeBoard(models.Model):
 	
 	def __str__(self):
 		return self.title
-
-
-class Inauguration(models.Model):
-	name = models.CharField(max_length=300)
-	flag = models.BooleanField(default=False)
-	date = models.DateTimeField(blank=True)
-    
-	def __str__(self):
-		return self.name

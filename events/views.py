@@ -1,3 +1,4 @@
+# TODO: clean imports
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
@@ -13,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 import csv
 
 
+# TODO: simplify with drf
 @api_view(['GET', ])
 def get_events(request, year):
     # print(request.META['SERVER_PROTOCOL'])
@@ -38,6 +40,7 @@ def get_events(request, year):
     }, status=res_status)
 
 
+# TODO: simplify with drf
 @api_view(['POST', ])
 @ecell_user
 def event_register(request, id):
@@ -61,6 +64,10 @@ def event_register(request, id):
     return Response({
         "message": res_message
     }, status=res_status)
+
+
+
+# TODO: simplify with drf
 @api_view(['POST', ])
 @ecell_user
 def event_unregister(request, id):
@@ -87,67 +94,9 @@ def event_unregister(request, id):
     return Response({
         "message": res_message
     }, status=res_status)
-@api_view(['POST', ])
-@ecell_user
-def add_event(request):
-    
-    if request.ecelluser.user_type in ['GST', 'VLT', 'CAB']:
-        return Response({
-            "message": "Unauthorized to view this page"
-        }, status=status.HTTP_401_UNAUTHORIZED)
-
-    res_message = ""
-    request.data['ecell_user'] = request.ecelluser.pk
-    event = EventSerializer(data=request.data)
-
-    try:
-        event.is_valid(raise_exception=True)
-    except Exception as e:
-        error = event.errors
-        error_msg = ""
-        for err in error:
-            error_msg += "Error in field:"+str(err)+" -"+str(error[err][0]) + " "
-        res_message = error_msg
-        res_status = status.HTTP_400_BAD_REQUEST
-    else:
-        event.save()
-        res_message = "Event Added Successfully"
-        res_status = status.HTTP_200_OK
-
-    return Response({
-        "message": res_message
-    }, status=res_status)
 
 
-@api_view(['GET', ])
-@permission_classes((IsAdminUser,))
-def generate_spreadsheet(request):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="events.csv"'
-
-    writer = csv.writer(response)
-    writer.writerow(['Name', 'Venue', 'Date', 'Time', 'Details', 'Coverpic',
-                     'Icon', 'Email', 'Flag'])
-
-    events = Event.objects.all().values_list('name', 'venue', 'date', 'time',
-                                             'details', 'cover_pic', 'icon', 'email', 'flag')
-
-    for event in events:
-        writer.writerow(event)
-
-    return response
-
-
+# TODO: in next meeting report why this exsits
 class NoticeBoardListView(ListAPIView):
     queryset = NoticeBoard.objects.filter(show=True)
     serializer_class = NoticeBoardSerializer
-
-
-class InaugurationViewset(ModelViewSet):
-    queryset = Inauguration.objects.filter()
-    serializer_class = InaugurationSerializer
-
-
-class EcellCadets(ModelViewSet):
-    queryset = Event.objects.filter(year=2020)
-    serializer_class = EventSerializer
