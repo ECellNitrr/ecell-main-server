@@ -1,3 +1,4 @@
+# TODO: remove unused
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import Member
