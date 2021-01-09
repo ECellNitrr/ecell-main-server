@@ -3,13 +3,6 @@ from .models import *
 from decorators import get_user
 
 
-class InaugurationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Inauguration
-        fields = '__all__'
-
-
-
 class NoticeBoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = NoticeBoard
@@ -27,6 +20,7 @@ class EventListSerializer(serializers.ModelSerializer):
     no_of_ppl_registered = serializers.SerializerMethodField()
     website_url = serializers.SerializerMethodField()
     
+    # TODO: this method can be simplified further with right implementation 
     def get_website_url(self,obj):
         req = self.context['request']
         return '{}://{}/events/{}/'.format(req.scheme, req.get_host() ,obj.id)
