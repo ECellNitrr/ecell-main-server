@@ -26,7 +26,7 @@ class RegistrationAPIView(APIView):
         res_detail = ""
         res_token = ""
         res_status = status.HTTP_400_BAD_REQUEST
-        user = request.data
+        user = request.data.copy()
 
         otp = str(randint(1000, 9999))
         password = user['password']

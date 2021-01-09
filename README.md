@@ -9,11 +9,11 @@ To Setup this Project and contribute follow below guidelines.
 
 1. First fork the repo and clone it using
 
-   `git clone https://github.com/<Your-Username>/EcellWeb2k19.git`
+   `https://github.com/<Your-Username>/ecell-main-server.git`
 
 2. Change the CWD to the project folder
 
-   `cd EcellWeb2k19`
+   `cd ecell-main-server/`
 
 3. Make virtual Environment (Python version recommeded = v3.6)
 
@@ -27,26 +27,28 @@ To Setup this Project and contribute follow below guidelines.
 
    `pip install -r requirements.txt`
 
-6. Setup Postgres Database with given credentials
+6. Make a copy of `.env.save` to `.env` and change the values of variables with original values.
 
-   > DATABASE NAME : ecellweb
+7. Setup MYSQL Database with given credentials
 
-   > USERNAME : ecellnitrr
+   > DATABASE NAME : ecelldb
 
-   > PASSWORD : ECellWeb2k19
+   > USERNAME : root
 
-7. Make all the Migrations
+   > PASSWORD : datapostgres
+
+8. Make all the Migrations
 
    `python manage.py makemigrations`
 
-8. Run Migration command
+9. Run Migration command
 
    `python manage.py migrate`
 
-9. Make a superuser for admin panel
+10. Make a superuser for admin panel
 
    `python manage.py createsuperuser`
 
-10. Run the server
+11. Run the server
 
     `python manage.py runserver`
