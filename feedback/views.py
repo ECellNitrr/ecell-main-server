@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .serializers import FeedbackSerializer
 from rest_framework import status
 
-# Create your views here.
+# TODO: simplity with DRF
 @api_view(['POST',])
 def feedback(request):
     f = FeedbackSerializer(data=request.data)
