@@ -39,7 +39,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'contact', 'password', 'otp']
+        fields = ['first_name', 'last_name', 'email', 'contact', 'password']
     
     def save(self, otp):
 
@@ -61,3 +61,7 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(allow_blank=False)
     password = serializers.CharField(allow_blank=False)
     
+class VerifyOTPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['otp']

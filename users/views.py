@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import RegistrationSerializer, LoginSerializer
+from .serializers import RegistrationSerializer, LoginSerializer, VerifyOTPSerializer
 from utils.auth_utils import send_otp, send_email_otp
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -11,11 +11,22 @@ from random import randint
 from .models import CustomUser
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
+from drf_yasg.utils import swagger_auto_schema
+from utils.swagger import set_example
+from . import responses
 
 class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = RegistrationSerializer
     
+    @swagger_auto_schema(
+        operation_id='create_user',
+        request_body=RegistrationSerializer,
+        responses={
+            '201': set_example({}),
+            '400': set_example(responses.user_registration_400)
+        },
+    )
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
 
@@ -33,17 +44,25 @@ class RegistrationAPIView(APIView):
 class LoginAPIView(APIView):
     serializer_class = LoginSerializer
 
+    @swagger_auto_schema(
+        operation_id='login_user',
+        request_body=LoginSerializer,
+        responses={
+            '202': set_example(responses.login_202),
+            '400': set_example(responses.login_400),
+            '401': set_example(responses.login_401),
+            '404': set_example(responses.login_404)
+        },
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
 
         if serializer.is_valid():
             found_email =  serializer.data['email']
-            print(serializer.data)
             user = authenticate(
                 username=serializer.data['email'],
                 password=serializer.data['password']
             )    
-            print(user)
             if user:
                 token, _ = Token.objects.get_or_create(user=user)
                 return Response({'token': f"Token {token.key}"}, status.HTTP_202_ACCEPTED)
@@ -84,7 +103,16 @@ def forgot_password(request):
             "message": message,
         }, status=res_status)
 
-
+@swagger_auto_schema(
+    operation_id='verify_otp',
+    request_body=VerifyOTPSerializer,
+    method='post',
+    responses={
+        '200': set_example(responses.verify_otp_200),
+        '400': set_example(responses.verify_otp_400),
+        '401': set_example(responses.verify_otp_401),
+    },
+)
 @api_view(['POST',])
 @permission_classes([IsAuthenticated])
 def verify_otp(request):
@@ -93,7 +121,7 @@ def verify_otp(request):
     req_data = request.data
 
     if 'otp' not in req_data:
-        message ='Please enter otp to verify your account'
+        message ='Please enter OTP to verify your account'
     elif user.verified==True:
         message = 'Account already verified'
     else:
@@ -104,7 +132,7 @@ def verify_otp(request):
             message = 'Account verified successfully'
             res_status = status.HTTP_200_OK
         else:
-            message = 'Invalid otp'
+            message = 'Invalid OTP'
 
     return Response({
             "message": message,
