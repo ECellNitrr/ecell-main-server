@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'iportal',
     'investors',
     'django_summernote',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
