@@ -14,9 +14,9 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Tutor API",
+      title="ECell Main Server API",
       default_version='v1',
-      description="Swagger API UI for tutor app",
+      description="Swagger API UI for ecell main server",
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
