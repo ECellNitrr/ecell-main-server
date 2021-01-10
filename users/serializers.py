@@ -31,3 +31,8 @@ class LoginSerializer(serializers.Serializer):
                 'Invalid Credentials!'
             )
         return user
+
+class ForgetPasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email']

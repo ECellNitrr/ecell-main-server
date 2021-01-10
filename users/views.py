@@ -153,8 +153,77 @@ class LoginAPIView(APIView):
 
 
 
+class ForgetPasswordView(APIView):
+    @swagger_auto_schema(
+        operation_id='forget_password',
+        request_body=ForgetPasswordSerializer,
+        responses={
+            '200': set_example(responses.forget_password_200),
+            '400': set_example(responses.forget_password_400),
+            '404': set_example(responses.login_404),
+        },
+    )
+    def post(self, request):
+        """
+        Forgot Password API where the email is posted and OTP is sent to the user.
+        """
+
+        serializer = ForgetPasswordSerializer(data=request.data)
+
+        # Checking if the email entered is valid.
+        if serializer.is_valid():
+            valid_data = serializer.validated_data
+
+            # Check if such a user exists.
+            try:
+                user = User.objects.get(email=valid_data['email'])
+            except User.DoesNotExist:
+                return Response("Account with this email id doesn't exists. Kindly signup.", status.HTTP_404_NOT_FOUND)
+            else:
+                # Setting Variables to check the time lapse.
+                time_now = datetime.datetime.now()
+                otp_created_at = user.otp_created_at
+                one_hour = datetime.timedelta(hours = 1)
+
+                # Mail Variables
+                subject = 'OTP to Reset your Password'
+                body = "Dear user,</br></br>\
+                <b>The OTP to reset your password is {}</b>.</br>\
+                Please do not share it with anyone.</br>\
+                </br>\
+                Best Regards,</br>\
+                Teesco (Volunteer Management System)"
+
+                # Check if OTP was ever generated for this user.
+                if user.otp == None:
+                    self.generate_otp(user)
+                    print(user.otp) #printing the otp in the terminal for now. we will integrate once we get a provider
+
+                # Check if the time lapse is greater than 1 hour.
+                elif time_now-otp_created_at.replace(tzinfo=None)>one_hour:
+                    self.generate_otp(user)
+                    print(user.otp) #printing the otp in the terminal for now. we will integrate once we get a provider
+
+                else:
+                    print(user.otp) #printing the otp in the terminal for now. we will integrate once we get a provider
+
+                return Response("An otp has been sent to your mobile no to reset your password", status.HTTP_200_OK)
+
+        # If the email entered was invalid or empty.
+        else:
+            data = serializer.errors
+            return Response(data, status.HTTP_400_BAD_REQUEST)
+
+    def generate_otp(self, user):
+        """
+        Method to generate OTPs and save it in OTP field.
+        """
+        user.otp = get_random_string(5, allowed_chars='0123456789')
+        user.otp_created_at = timezone.now()
+        user.save()
+
 @api_view(['POST'])
-@client_check
+@client_check    #to be seen
 def forgot_password(request):
     res_status = status.HTTP_400_BAD_REQUEST
     req_data = request.data
