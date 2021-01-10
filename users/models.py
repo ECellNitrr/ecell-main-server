@@ -53,11 +53,6 @@ class CustomUser(AbstractUser):
             timediff = now - self.modified_at
             return timediff.total_seconds()
 
-
-    def save(self, *args, **kwargs):
-        self.username = self.email
-        super(CustomUser, self).save(*args, **kwargs)
-
     def __str__(self):
         return self.email
 

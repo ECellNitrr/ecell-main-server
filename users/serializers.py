@@ -1,33 +1,67 @@
 from rest_framework import serializers
-from django.contrib.auth import authenticate
+from rest_framework.validators import UniqueValidator
 from .models import CustomUser
-from django.core.exceptions import ValidationError
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    
+
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8,
+        error_messages={
+            "blank": "Password cannot be empty.",
+            "min_length": "Password must be atleast 8 characters.",
+        },
+        allow_blank=False,
+        required=True
+    )
+
+    email = serializers.EmailField(
+        validators=[
+            UniqueValidator(
+            queryset= CustomUser.objects.all(),
+            message="This email is already registered with us.",
+        )],
+        error_messages={
+            "required": "Email field is required.",
+            "invalid" : "Kindly enter a Valid Email Address",
+        },
+        allow_blank=False,
+        required=True
+    )
+
+    first_name = serializers.CharField(
+        allow_blank=False,
+        required=True,
+        error_messages={
+            "required": "Name field is required.", 
+        },)
+
     class Meta:
         model = CustomUser
-        read_only_fields = ['id']
-        fields = ['first_name', 'last_name', 'email', 'contact', 'password', 'otp','id']
+        fields = ['first_name', 'last_name', 'email', 'contact', 'password']
+    
+    def save(self, otp):
+
+        user = CustomUser.objects.create_user(
+            email=self.validated_data['email'],
+            username=self.validated_data['email'],
+            first_name=self.validated_data['first_name'],
+            last_name=self.validated_data['last_name'],
+            password=self.validated_data['password'],
+            contact=self.validated_data['contact'],
+            otp= otp
+        )
+
+        user.save()
+        return user
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=255)
-    password = serializers.CharField(max_length=128, write_only=True)
-
+    email = serializers.EmailField(allow_blank=False)
+    password = serializers.CharField(allow_blank=False)
+    
+class VerifyOTPSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = '__all__'
-
-
-    def ecelluser_authenticate(self):
-        data = self.validated_data
-        email = data['email']
-        password = data['password']
-        user = authenticate(username=email, password=password)
-        if user is None:
-            raise ValidationError(
-                'Invalid Credentials!'
-            )
-        return user
+        fields = ['otp']
