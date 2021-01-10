@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'rest_framework',
+    'rest_framework.authtoken',
     'events',
     'sponsors',
     'mentors',
@@ -242,4 +243,4 @@ AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 AWS_DEFAULT_REGION = 'eu-west-1'
 AWS_SES_REGION_ENDPOINT = 'email.us-west-1.amazonaws.com'
-MOCK_SMS_EMAIL = config('MOCK_SMS_EMAIL')
+MOCK_SMS_EMAIL = config('MOCK_SMS_EMAIL', cast=bool, default=True)

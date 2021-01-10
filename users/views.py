@@ -1,155 +1,62 @@
-from django.shortcuts import render
-import jwt
-import json
-from django.conf import settings
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import RegistrationSerializer, LoginSerializer
-from django.http import JsonResponse
-from django.contrib.auth.hashers import make_password
 from utils.auth_utils import send_otp, send_email_otp
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from decorators import ecell_user, client_check
 from random import randint
 from .models import CustomUser
-import traceback
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
 
-# TODO: teesco style
 class RegistrationAPIView(APIView):
-    authentication_classes = []
     permission_classes = (AllowAny,)
     serializer_class = RegistrationSerializer
     
     def post(self, request):
-        res_message = "Registration failed"
-        res_detail = ""
-        res_token = ""
-        res_status = status.HTTP_400_BAD_REQUEST
-        user = request.data.copy()
+        serializer = RegistrationSerializer(data=request.data)
 
-        otp = str(randint(1000, 9999))
-        password = user['password']
-        if password is None or password=='':
-            res_detail+='Error in field:Password-This field must not be empty'
-            
+        if serializer.is_valid():
+            otp = str(randint(1000, 9999))
+            user = serializer.save(otp)
+            send_email_otp(recipient_list=[user.email], otp=otp)
+            return Response({}, status.HTTP_201_CREATED)
         else:
-            user['password'] = make_password(password)
-            user['otp'] = otp
+            data = serializer.errors
+            return Response(data, status.HTTP_400_BAD_REQUEST)
 
-            serializer = self.serializer_class(data=user)
-            try:
-                serializer.is_valid(raise_exception=True)
-            except Exception as e:
-                error = serializer.errors
-                error_msg = ""
-                for err in error:
-                    error_msg += "Error in field: " + \
-                        str(err) + "- " + str(error[err][0]) + " "
-                res_detail = error_msg
 
-            else:
-                serializer.save()
-                user = serializer.validated_data
-                payload = {
-                    'email': serializer.validated_data['email']
-                }
-                otp = send_email_otp(recipient_list=[serializer.validated_data['email']], otp=otp)
-                token = jwt.encode(
-                    payload,
-                    settings.SECRET_KEY,
-                    algorithm='HS256').decode('UTF-8')
-                res_message = "Registration Successful"
-                res_token = token
-                res_status = status.HTTP_200_OK
 
-            user_obj = CustomUser.objects.get(email=user['email'])
-
-            return Response({
-                "message": res_message,
-                "detail": res_detail,
-                "token": res_token,
-                
-                'first_name' : user['first_name'],
-                'last_name' : user['last_name'],
-                'email' : user['email'],
-                'verified' : False,
-                'contact' : user['contact'],
-                'bquiz_score' : 0,
-                'user_type' : 'GST',
-                'linkedin' : 0,
-                'facebook' : 0,
-                'applied' : 0,
-                'id': user_obj.id
-            }, status=res_status)
-
-# TODO: teesco style
 class LoginAPIView(APIView):
-    authentication_classes = []
-    permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
 
     def post(self, request):
-        res_message = "Login failed"
-        res_detail = ""
-        res_token = ""
-        res_status = status.HTTP_400_BAD_REQUEST
-        user = request.data
-        serializer = self.serializer_class(data=user)
-        try:
-            serializer.is_valid(raise_exception=True)
-        except Exception as e:
-            error = serializer.errors
-            error_msg = ""
-            for err in error:
-                error_msg += "Error in field: " + \
-                    str(err) + "- " + str(error[err][0]) + " "
-            res_detail = error_msg
-        else:
-            try:
-                user = serializer.ecelluser_authenticate()
-            except Exception as e:
-                res_detail = str(e.message)
-                return Response({
-                    "message": res_message,
-                    "detail": res_detail,
-                    "token": res_token,
-                }, status=res_status)
+        serializer = LoginSerializer(data=request.data)
 
+        if serializer.is_valid():
+            found_email =  serializer.data['email']
+            print(serializer.data)
+            user = authenticate(
+                username=serializer.data['email'],
+                password=serializer.data['password']
+            )    
+            print(user)
+            if user:
+                token, _ = Token.objects.get_or_create(user=user)
+                return Response({'token': f"Token {token.key}"}, status.HTTP_202_ACCEPTED)
             else:
-                payload = {
-                    'email': serializer.validated_data['email']
-                }
-                token = jwt.encode(
-                    payload,
-                    settings.SECRET_KEY,
-                    algorithm='HS256').decode('UTF-8')
-                res_message = "Login successful"
-                res_detail = ""
-                res_token = token
-                res_status = status.HTTP_200_OK
-
-        # try:
-                return Response({
-                    "message": res_message,
-                    "detail": res_detail,
-                    "token": res_token,
+                try:
+                    if CustomUser.objects.get(email=found_email):
+                        return Response({'detail': 'Credentials did not match'}, status.HTTP_401_UNAUTHORIZED)
                     
-                    'first_name' : user.first_name,
-                    'last_name' : user.last_name,
-                    'email' : user.email,
-                    'verified' : user.verified,
-                    'contact' : user.contact,
-                    'bquiz_score' : user.bquiz_score,
-                    'user_type' : user.user_type,
-                    'linkedin' : user.linkedin,
-                    'facebook' : user.facebook,
-                    'applied' : user.applied,
-                    'id': user.id
-                }, status=res_status)
-        # except:
-            # traceback.print_exc()
+                except CustomUser.DoesNotExist:
+                    return Response({"detail": "User not found"}, status.HTTP_404_NOT_FOUND)     
+        else:
+            data = serializer.errors
+            return Response(data, status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -178,16 +85,13 @@ def forgot_password(request):
         }, status=res_status)
 
 
-# TODO: make print the otp in the terminal for now. we will integrate once we get a provider
 @api_view(['POST',])
-@ecell_user 
-@client_check
+@permission_classes([IsAuthenticated])
 def verify_otp(request):
     res_status = status.HTTP_400_BAD_REQUEST
-    user = request.ecelluser
-    print(user)
+    user = request.user
     req_data = request.data
-    print(req_data)
+
     if 'otp' not in req_data:
         message ='Please enter otp to verify your account'
     elif user.verified==True:
