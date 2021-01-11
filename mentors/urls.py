@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.urls import path
+from .models import Mentor
 from . import views
+from .serializers import MentorListSerializer
 
 urlpatterns = [
-    path('list/<int:year>/', views.get_mentors, name="get_mentors"),
+    path('list/<year>', views.MentorView.as_view(), name='mentor_list')
 ]
