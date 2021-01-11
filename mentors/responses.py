@@ -3,18 +3,18 @@ get_mentors_200 ={
   "data": [
     {
         "id": 0,
-        "name": "string",
-        "email": "string",
-        "contact": "string",
-        "detail": "string",
-        "description": "string",
-        "profile_pic_url": "string",
-        "year": 0,
+        "name": "test",
+        "email": "test@tmail.com",
+        "contact": "9999999999",
+        "detail": "test_detail",
+        "description": "test_desc",
+        "profile_pic_url": "test_profile_pic",
+        "year": 9999,
         "flag": True
     }
   ]
 }
 
 mentors_not_found_404 = {
-    "detail": "Mentors couldn't be fetched."
+    "message": "Mentors couldn't be fetched."
 }
