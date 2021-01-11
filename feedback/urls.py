@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from . import views
-
+from .views import *
 urlpatterns = [
-    path('post/', views.feedback, name="post_feedback"),
+    path('post/', FeedbackView.as_view(), name="post_feedback"),
 ]

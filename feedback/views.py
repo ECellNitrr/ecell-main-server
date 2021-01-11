@@ -1,29 +1,30 @@
+from rest_framework import response
+from utils.swagger import set_example
 from django.shortcuts import render
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from .serializers import FeedbackSerializer
-from rest_framework import status
-
-# TODO: simplity with DRF
-@api_view(['POST',])
-def feedback(request):
-    f = FeedbackSerializer(data=request.data)
-
-    try:
-        f.is_valid(raise_exception=True)
-    except Exception as e:
-        error = f.errors
-        error_msg = ""
-        for err in error:
-            error_msg += "Error in field: "+str(err)+"- "+str(error[err][0]) + " "
-        res_message = error_msg
-        res_status = status.HTTP_400_BAD_REQUEST
-    else:
-        f.save()
-        res_message = "Feedback Posted Successfully"
-        res_status = status.HTTP_200_OK
-
-    return Response({
-        "message": res_message
-    }, status=res_status)
+from rest_framework import serializers, status
+from . import responses
+class FeedbackView(APIView):
+    @swagger_auto_schema(
+        request_body=FeedbackSerializer,
+        responses={
+            '201' : set_example(responses.feedback_created_201),
+            '400' : set_example(responses.feedback_invalid_400)
+        }
+    )
+    def post(self,request):
+        f = FeedbackSerializer(data=request.data)
+        if f.is_valid():
+            f.save()
+            return Response({"message" : "Feedback Posted Successfully"},status.HTTP_201_CREATED)
+        else:
+            error = f.errors
+            error_msg = ""
+            for err in error:
+                error_msg += "Error in field: "+str(err)+"- "+str(error[err][0]) + " "
+            return Response({"message" : error_msg},status.HTTP_400_BAD_REQUEST)
 
