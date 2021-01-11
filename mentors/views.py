@@ -15,7 +15,6 @@ class MentorView(generics.ListAPIView):
 
     @swagger_auto_schema(
         operation_id='get_mentors',
-        request_body=MentorListSerializer,
         responses={
             '200': set_example(responses.get_mentors_200),
             '404': set_example(responses.mentors_not_found_404),
