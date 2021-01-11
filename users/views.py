@@ -1,8 +1,10 @@
+import datetime
+from datetime import timedelta
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import RegistrationSerializer, LoginSerializer, VerifyOTPSerializer
+from .serializers import RegistrationSerializer, LoginSerializer, VerifyOTPSerializer, ForgetPasswordSerializer, ChangePasswordSerializer
 from utils.auth_utils import send_otp, send_email_otp
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -80,6 +82,9 @@ class LoginAPIView(APIView):
 
 
 class ForgetPasswordView(APIView):
+
+    serializer_class = ForgetPasswordSerializer
+    
     @swagger_auto_schema(
         operation_id='forget_password',
         request_body=ForgetPasswordSerializer,
@@ -102,75 +107,65 @@ class ForgetPasswordView(APIView):
 
             # Check if such a user exists.
             try:
-                user = User.objects.get(email=valid_data['email'])
-            except User.DoesNotExist:
+                user = CustomUser.objects.get(email=valid_data['email'])
+            except CustomUser.DoesNotExist:
                 return Response("Account with this email id doesn't exists. Kindly signup.", status.HTTP_404_NOT_FOUND)
             else:
-                # Setting Variables to check the time lapse.
-                time_now = datetime.datetime.now()
-                otp_created_at = user.otp_created_at
-                one_hour = datetime.timedelta(hours = 1)
+                otp = str(randint(1000, 9999))
+                user.otp = otp
+                user.save()
+                send_email_otp(recipient_list=[user.email], otp=otp)
 
-                # Mail Variables
-                subject = 'OTP to Reset your Password'
-                body = "Dear user,</br></br>\
-                <b>The OTP to reset your password is {}</b>.</br>\
-                Please do not share it with anyone.</br>\
-                </br>\
-                Best Regards,</br>\
-                Teesco (Volunteer Management System)"
-
-                # Check if OTP was ever generated for this user.
-                if user.otp == None:
-                    self.generate_otp(user)
-                    print(user.otp) #printing the otp in the terminal for now. we will integrate once we get a provider
-
-                # Check if the time lapse is greater than 1 hour.
-                elif time_now-otp_created_at.replace(tzinfo=None)>one_hour:
-                    self.generate_otp(user)
-                    print(user.otp) #printing the otp in the terminal for now. we will integrate once we get a provider
-
-                else:
-                    print(user.otp) #printing the otp in the terminal for now. we will integrate once we get a provider
-
-                return Response("An otp has been sent to your mobile no to reset your password", status.HTTP_200_OK)
+                return Response("An otp has been sent to you to reset your password", status.HTTP_200_OK)
 
         # If the email entered was invalid or empty.
         else:
             data = serializer.errors
             return Response(data, status.HTTP_400_BAD_REQUEST)
 
-    def generate_otp(self, user):
-        """
-        Method to generate OTPs and save it in OTP field.
-        """
-        user.otp = get_random_string(5, allowed_chars='0123456789')
-        user.otp_created_at = timezone.now()
-        user.save()
+class ChangePasswordView(APIView):
+    
+    serializer_class = ChangePasswordSerializer
 
-@api_view(['POST'])
-@client_check    #to be seen
-def forgot_password(request):
-    res_status = status.HTTP_400_BAD_REQUEST
-    req_data = request.data
-    email = req_data['email']
-    print(email)
-    try:
-        user = CustomUser.objects.get(email=email)
-        print(user)
-    except:
-        message = "Account with this email id doesn't exists. Kindly signup."
-    else:
-        email = user.email
-        otp = send_email_otp([email])
-        user.otp = otp
-        user.save()
-        message = "An otp has been sent to your mobile no to reset your password"
-        res_status = status.HTTP_200_OK
+    @swagger_auto_schema(
+        operation_id='change_password',
+        request_body=ChangePasswordSerializer,
+        responses={
+            '200': set_example(responses.change_password_200),
+            '400': set_example(responses.change_password_400),
+            '404': set_example(responses.change_password_404),
+            '401': set_example(responses.change_password_401),
+        },
+    )
 
-    return Response({
-            "message": message,
-        }, status=res_status)
+    def post(self, request):
+        '''
+        Change password API is where the email, otp and password is posted and password is changed
+        '''
+
+        serializer = ChangePasswordSerializer(data=request.data)
+
+        if serializer.is_valid():
+            valid_data = serializer.validated_data
+
+            # Check if such a user exists.
+            try:
+                user = CustomUser.objects.get(email=valid_data['email'])
+            except CustomUser.DoesNotExist:
+                return Response("Account with this email id doesn't exists. Kindly signup.", status.HTTP_404_NOT_FOUND)
+            
+            if valid_data['otp'] == user.otp:
+                user.set_password(valid_data['password'])
+                user.save()
+                return Response('Password changed successfully', status.HTTP_200_OK)
+            else:
+                return Response('Invalid otp', status.HTTP_401_UNAUTHORIZED)
+
+        else:
+            data = serializer.errors
+            return Response(data, status.HTTP_400_BAD_REQUEST)
+            
+
 
 @swagger_auto_schema(
     operation_id='verify_otp',

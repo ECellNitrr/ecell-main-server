@@ -57,3 +57,37 @@ verify_otp_400 = {
 verify_otp_401 = {
   "detail": "Authentication credentials were not provided."
 }
+
+forget_password_200 = {
+    'detail': 'An OTP has been sent to your email.'
+}
+
+forget_password_400 = {
+  "email": [
+    "Enter a valid email address.",
+    "This field is required."
+  ]
+}
+
+forget_password_404 = {
+    'detail': 'User does not exist.'
+}
+
+change_password_200 = {
+    'detail': 'Password changed successfully'
+}
+
+change_password_400 = {
+  "email": [
+    "Enter a valid email address.",
+    "This field is required."
+  ]
+}
+
+change_password_404 = {
+    'detail': "Account with this email id doesn't exists. Kindly signup."
+}
+
+change_password_401 = {
+    'detail': 'Invalid otp'
+}

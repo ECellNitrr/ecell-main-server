@@ -65,3 +65,40 @@ class VerifyOTPSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['otp']
+
+class ForgetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        error_messages={
+            "required": "Email field is required.",
+            "invalid" : "Kindly enter a Valid Email Address",
+        },
+        allow_blank=False,
+        required=True
+    )
+
+class ChangePasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        error_messages={
+            "required": "Email field is required.",
+            "invalid" : "Kindly enter a Valid Email Address",
+        },
+        allow_blank=False,
+        required=True
+    )
+    otp = serializers.CharField(
+        error_messages={
+            "required": "OTP field is required.",
+        },
+        allow_blank=False,
+        required=True
+    )
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8,
+        error_messages={
+            "blank": "Password cannot be empty.",
+            "min_length": "Password must be atleast 8 characters.",
+        },
+        allow_blank=False,
+        required=True
+    )
