@@ -111,10 +111,7 @@ class ForgetPasswordView(APIView):
             try:
                 user = CustomUser.objects.get(email=valid_data['email'])
             except CustomUser.DoesNotExist:
-                return Response(
-                    {"detail":"Account with this email id doesn't exists. Kindly signup."},
-                    status.HTTP_404_NOT_FOUND
-                )
+                return Response(responses.forget_password_404, status.HTTP_404_NOT_FOUND)
             else:
                 #Generate OTP
                 otp = str(randint(1000, 9999))
@@ -126,10 +123,7 @@ class ForgetPasswordView(APIView):
                 #Send OTP
                 send_email_otp(recipient_list=[user.email], otp=otp)
 
-                return Response(
-                    {"detail":"An otp has been sent to you to reset your password"},
-                    status.HTTP_200_OK
-                )
+                return Response(responses.forget_password_200, status.HTTP_200_OK)
 
         # If the email entered was invalid or empty.
         else:
@@ -166,10 +160,7 @@ class ChangePasswordView(APIView):
             try:
                 user = CustomUser.objects.get(email=valid_data['email'])
             except CustomUser.DoesNotExist:
-                return Response(
-                    {"detail":"Account with this email id doesn't exists. Kindly signup."},
-                    status.HTTP_404_NOT_FOUND
-                )
+                return Response(responses.change_password_404, status.HTTP_404_NOT_FOUND)
 
             #Checking is vorrect otp is entered
             if valid_data['otp'] == user.otp:
@@ -177,8 +168,8 @@ class ChangePasswordView(APIView):
                 #Update Password
                 user.set_password(valid_data['password'])
                 user.save()
-                return Response({"detail":"Password changed successfully"}, status.HTTP_200_OK)
-            return Response({"detail":"Invalid otp"}, status.HTTP_401_UNAUTHORIZED)
+                return Response(responses.change_password_200, status.HTTP_200_OK)
+            return Response(responses.change_password_401, status.HTTP_401_UNAUTHORIZED)
 
         data = serializer.errors
         return Response(data, status.HTTP_400_BAD_REQUEST)
