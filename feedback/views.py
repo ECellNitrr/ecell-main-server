@@ -3,7 +3,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import FeedbackSerializer
-from rest_framework import status
+from rest_framework import serializers, status
 from . import responses
 class FeedbackView(APIView):
     @swagger_auto_schema(
@@ -14,12 +14,12 @@ class FeedbackView(APIView):
         }
     )
     def post(self,request):
-        f = FeedbackSerializer(data=request.data)
-        if f.is_valid():
-            f.save()
-            return Response({"message" : "Feedback Posted Successfully"},status.HTTP_201_CREATED)
+        serializer = FeedbackSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(responses.feedback_created_201,status.HTTP_201_CREATED)
         else:
-            error = f.errors
+            error = serializer.errors
             error_msg = ""
             for err in error:
                 error_msg += "Error in field: "+str(err)+"- "+str(error[err][0]) + " "
