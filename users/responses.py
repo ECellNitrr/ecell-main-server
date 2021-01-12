@@ -59,7 +59,7 @@ verify_otp_401 = {
 }
 
 forget_password_200 = {
-    'detail': 'An OTP has been sent to your email.'
+    "detail": "An OTP has been sent to your email."
 }
 
 forget_password_400 = {
@@ -70,24 +70,31 @@ forget_password_400 = {
 }
 
 forget_password_404 = {
-    'detail': 'User does not exist.'
+    "detail": "User does not exist."
 }
 
 change_password_200 = {
-    'detail': 'Password changed successfully'
+    "detail": "Password changed successfully"
 }
 
 change_password_400 = {
   "email": [
     "Enter a valid email address.",
     "This field is required."
+  ],
+  "otp": [
+      "OTP field is required.",
+  ],
+  "password": [
+      "Password cannot be empty.",
+      "Password must be atleast 8 characters."
   ]
 }
 
 change_password_404 = {
-    'detail': "Account with this email id doesn't exists. Kindly signup."
+    "detail": "Account with this email id doesn't exists. Kindly signup."
 }
 
 change_password_401 = {
-    'detail': 'Invalid otp'
+    "detail": "Invalid otp"
 }

@@ -34,13 +34,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
         allow_blank=False,
         required=True,
         error_messages={
-            "required": "Name field is required.", 
+            "required": "Name field is required.",
         },)
 
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'email', 'contact', 'password']
-    
+
     def save(self, otp):
 
         user = CustomUser.objects.create_user(
@@ -60,13 +60,16 @@ class RegistrationSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(allow_blank=False)
     password = serializers.CharField(allow_blank=False)
-    
+
 class VerifyOTPSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['otp']
 
 class ForgetPasswordSerializer(serializers.Serializer):
+    '''This serializer takes input for POST request to generate OTP i.e.
+    required to change the password using email address of user.'''
+
     email = serializers.EmailField(
         error_messages={
             "required": "Email field is required.",
@@ -77,6 +80,9 @@ class ForgetPasswordSerializer(serializers.Serializer):
     )
 
 class ChangePasswordSerializer(serializers.Serializer):
+    '''This serialiser takes input for POST request to change
+    user password with OTP, Email and New Password'''
+
     email = serializers.EmailField(
         error_messages={
             "required": "Email field is required.",
