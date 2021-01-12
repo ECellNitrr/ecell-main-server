@@ -1,12 +1,9 @@
-from rest_framework import response
 from utils.swagger import set_example
-from django.shortcuts import render
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import FeedbackSerializer
-from rest_framework import serializers, status
+from rest_framework import status
 from . import responses
 class FeedbackView(APIView):
     @swagger_auto_schema(

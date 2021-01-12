@@ -3,5 +3,8 @@ feedback_created_201 = {
 }
 
 feedback_invalid_400 = {
-    "message" : "error_msg"
+    "message" : [
+        "Error in field: name- Ensure this field has no more than 100 characters.",
+        "Error in field: email- Ensure this field has no more than 256 characters.",
+    ]
 }
