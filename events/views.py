@@ -16,7 +16,6 @@ class EventView(generics.ListAPIView):
     serializer_class = EventListSerializer
     @swagger_auto_schema(
         operation_id='get_events',
-        request_body=EventListSerializer,
         responses={
             '200': set_example(responses.get_events_200),
             '404': set_example(responses.events_not_found_404),
@@ -29,8 +28,7 @@ class EventView(generics.ListAPIView):
             return Response(responses.events_not_found_404, status.HTTP_404_NOT_FOUND)
         serializer = EventListSerializer(queryset, many=True, context={'request': request})
         data = serializer.data
-        if queryset.count() >= 0:
-            return Response({"message":"Events Fetched successfully","data":data},status.HTTP_200_OK)
+        return Response({"message":"Events Fetched successfully","data":data},status.HTTP_200_OK)
 
 # TODO: simplify with drf
 @api_view(['POST', ])
