@@ -1,7 +1,7 @@
+import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.timezone import utc
-import datetime
 
 class CustomUser(AbstractUser):
 
@@ -26,7 +26,7 @@ class CustomUser(AbstractUser):
     otp = models.CharField(max_length=4, blank=True, null=True)
     verified = models.BooleanField(default=False)
     contact = models.CharField(max_length=10)
-    
+
     #Score for Bquiz
     bquiz_score = models.IntegerField(default=0)
     # Scores for Campus Ambassadors
@@ -45,7 +45,7 @@ class CustomUser(AbstractUser):
     facebook = models.URLField(max_length=64, null=True, blank=True)
     created_at = models.DateTimeField(auto_now=True, editable=False)
     modified_at = models.DateTimeField(auto_now_add=True, editable=False)
-    
+
     @property
     def last_modified(self):
         if self.modified_at:
