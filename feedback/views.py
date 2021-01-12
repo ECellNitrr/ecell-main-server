@@ -18,10 +18,10 @@ class FeedbackView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(responses.feedback_created_201,status.HTTP_201_CREATED)
-        else:
-            error = serializer.errors
-            error_msg = ""
-            for err in error:
-                error_msg += "Error in field: "+str(err)+"- "+str(error[err][0]) + " "
-            return Response({"message" : error_msg},status.HTTP_400_BAD_REQUEST)
+        
+        error = serializer.errors
+        error_msg = ""
+        for err in error:
+            error_msg += "Error in field: "+str(err)+"- "+str(error[err][0]) + " "
+        return Response({"message" : error_msg},status.HTTP_400_BAD_REQUEST)
 
