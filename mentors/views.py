@@ -20,7 +20,7 @@ class MentorView(generics.ListAPIView):
             '404': set_example(responses.mentors_not_found_404),
         },
     )
-    def list(self, request, year):
+    def get(self, request, year):
         queryset = Mentor.objects.filter(year=year, flag=True)
         serializer = MentorListSerializer(queryset, many=True)
         data = serializer.data
