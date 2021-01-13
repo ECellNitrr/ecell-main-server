@@ -24,7 +24,7 @@ class MentorView(generics.ListAPIView):
     def get(self, request, year):
         try:
             queryset = Mentor.objects.filter(year=year, flag=True)
-        except Mentor.DoesNotExist:
+        except:
             return Response(responses.mentors_not_found_404, status.HTTP_404_NOT_FOUND)
         else:
             serializer = MentorListSerializer(queryset, many=True)
