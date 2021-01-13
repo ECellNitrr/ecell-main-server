@@ -6,8 +6,9 @@ from .serializers import *
 from decorators import ecell_user
 from rest_framework import status, generics
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
 from utils.swagger import set_example
+from rest_framework.views import APIView
 from . import responses
 
 class EventView(generics.ListAPIView):
@@ -30,32 +31,31 @@ class EventView(generics.ListAPIView):
         data = serializer.data
         return Response({"message":"Events Fetched successfully","data":data},status.HTTP_200_OK)
 
-# TODO: simplify with drf
-@api_view(['POST', ])
-@ecell_user
-def event_register(request, id):
-    eventregister = EventRegister()
-    user = request.ecelluser
-    res_status = status.HTTP_401_UNAUTHORIZED
-    if user.verified:
-        eventregister.user = user
-        try:
-            eventregister.event = Event.objects.get(id=id)
-        except:
-            res_message="Registration Failed. Event does not exist."
-            res_status=status.HTTP_404_NOT_FOUND
-            
+
+class EventRegisterView(APIView):
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        operation_id="event_register",
+        responses = {
+            '200': set_example(responses.event_registration_200),
+            '404':set_example(responses.event_does_not_exist_404),
+            '401':set_example(responses.user_unauthorized_401)
+        }
+    )
+    def post(self,request,id):
+        user = request.user
+        eventregister = EventRegister()
+        if user.verified:
+            eventregister.user = user
+            try:
+                eventregister.event = Event.objects.get(id=id)
+            except:
+                return Response(responses.event_does_not_exist_404, status.HTTP_404_NOT_FOUND)    
+            else:
+                eventregister.save()
+                return Response(responses.event_registration_200,status.HTTP_200_OK)
         else:
-            eventregister.save()
-            res_message= "Registration Successful"
-            res_status=status.HTTP_200_OK
-    else:
-        res_message = "You need to verify your account to register for an event"
-    return Response({
-        "message": res_message
-    }, status=res_status)
-
-
+            return Response(responses.user_unauthorized_401,status.HTTP_401_UNAUTHORIZED)
 
 # TODO: simplify with drf
 @api_view(['POST', ])
