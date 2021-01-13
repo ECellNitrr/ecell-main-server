@@ -20,11 +20,13 @@ class MentorView(generics.ListAPIView):
             '404': set_example(responses.mentors_not_found_404),
         },
     )
+
     def get(self, request, year):
-        queryset = Mentor.objects.filter(year=year, flag=True)
-        serializer = MentorListSerializer(queryset, many=True)
-        data = serializer.data
-        if queryset.count() > 0:
-            return Response({"message": "Mentors Fetched successfully.", "data": data}, status.HTTP_200_OK)
+        try:
+            queryset = Mentor.objects.filter(year=year, flag=True)
+        except Mentor.DoesNotExist:
+            return Response(responses.mentors_not_found_404, status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"message": "Mentors Couldn't be fetched"}, status.HTTP_404_NOT_FOUND)
+            serializer = MentorListSerializer(queryset, many=True)
+            data = serializer.data
+            return Response({"message": "Mentors Fetched successfully.", "data": data}, status.HTTP_200_OK)
