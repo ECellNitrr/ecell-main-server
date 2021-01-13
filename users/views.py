@@ -1,18 +1,22 @@
+from random import randint
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import RegistrationSerializer, LoginSerializer, VerifyOTPSerializer
-from utils.auth_utils import send_otp, send_email_otp
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from decorators import ecell_user, client_check
-from random import randint
-from .models import CustomUser
 from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
 from drf_yasg.utils import swagger_auto_schema
 from utils.swagger import set_example
+from utils.auth_utils import send_email_otp
+from decorators import ecell_user, client_check
+from .models import CustomUser
+from .serializers import (RegistrationSerializer, LoginSerializer,
+                            VerifyOTPSerializer, ForgetPasswordSerializer,
+                            ChangePasswordSerializer)
+
+
 from . import responses
 
 class RegistrationAPIView(APIView):
@@ -70,38 +74,107 @@ class LoginAPIView(APIView):
                 try:
                     if CustomUser.objects.get(email=found_email):
                         return Response({'detail': 'Credentials did not match'}, status.HTTP_401_UNAUTHORIZED)
-                    
+
                 except CustomUser.DoesNotExist:
-                    return Response({"detail": "User not found"}, status.HTTP_404_NOT_FOUND)     
+                    return Response({"detail": "User not found"}, status.HTTP_404_NOT_FOUND)
         else:
             data = serializer.errors
             return Response(data, status.HTTP_400_BAD_REQUEST)
 
 
 
-@api_view(['POST'])
-@client_check
-def forgot_password(request):
-    res_status = status.HTTP_400_BAD_REQUEST
-    req_data = request.data
-    email = req_data['email']
-    print(email)
-    try:
-        user = CustomUser.objects.get(email=email)
-        print(user)
-    except:
-        message = "Account with this email id doesn't exists. Kindly signup."
-    else:
-        email = user.email
-        otp = send_email_otp([email])
-        user.otp = otp
-        user.save()
-        message = "An otp has been sent to your mobile no to reset your password"
-        res_status = status.HTTP_200_OK
+class ForgetPasswordView(APIView):
 
-    return Response({
-            "message": message,
-        }, status=res_status)
+    serializer_class = ForgetPasswordSerializer
+
+    @swagger_auto_schema(
+        operation_id='forget_password',
+        request_body=ForgetPasswordSerializer,
+        responses={
+            '200': set_example(responses.forget_password_200),
+            '400': set_example(responses.forget_password_400),
+            '404': set_example(responses.forget_password_404),
+        },
+    )
+    def post(self, request):
+        """
+        Forgot Password API where the email is posted and OTP is sent to the user.
+        """
+
+        serializer = ForgetPasswordSerializer(data=request.data)
+
+        # Checking if the email entered is valid.
+        if serializer.is_valid():
+            valid_data = serializer.validated_data
+
+            # Check if such a user exists.
+            try:
+                user = CustomUser.objects.get(email=valid_data['email'])
+            except CustomUser.DoesNotExist:
+                return Response(responses.forget_password_404, status.HTTP_404_NOT_FOUND)
+            else:
+                #Generate OTP
+                otp = str(randint(1000, 9999))
+
+                #Update OTP
+                user.otp = otp
+                user.save()
+
+                #Send OTP
+                send_email_otp(recipient_list=[user.email], otp=otp)
+
+                return Response(responses.forget_password_200, status.HTTP_200_OK)
+
+        # If the email entered was invalid or empty.
+        else:
+            data = serializer.errors
+            return Response(data, status.HTTP_400_BAD_REQUEST)
+
+class ChangePasswordView(APIView):
+
+    serializer_class = ChangePasswordSerializer
+
+    @swagger_auto_schema(
+        operation_id='change_password',
+        request_body=ChangePasswordSerializer,
+        responses={
+            '200': set_example(responses.change_password_200),
+            '400': set_example(responses.change_password_400),
+            '404': set_example(responses.change_password_404),
+            '401': set_example(responses.change_password_401),
+        },
+    )
+
+    def post(self, request):
+        '''
+        Change password API is where the email, otp and password is posted and password is changed
+        '''
+
+        serializer = ChangePasswordSerializer(data=request.data)
+
+        #checking if entered data is valid
+        if serializer.is_valid():
+            valid_data = serializer.validated_data
+
+            # Check if such a user exists.
+            try:
+                user = CustomUser.objects.get(email=valid_data['email'])
+            except CustomUser.DoesNotExist:
+                return Response(responses.change_password_404, status.HTTP_404_NOT_FOUND)
+
+            #Checking is vorrect otp is entered
+            if valid_data['otp'] == user.otp:
+
+                #Update Password
+                user.set_password(valid_data['password'])
+                user.save()
+                return Response(responses.change_password_200, status.HTTP_200_OK)
+            return Response(responses.change_password_401, status.HTTP_401_UNAUTHORIZED)
+
+        data = serializer.errors
+        return Response(data, status.HTTP_400_BAD_REQUEST)
+
+
 
 @swagger_auto_schema(
     operation_id='verify_otp',

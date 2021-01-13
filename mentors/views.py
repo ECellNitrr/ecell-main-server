@@ -1,35 +1,32 @@
-# TODO: remove unused imports
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAdminUser
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from utils.swagger import set_example
 from .models import Mentor
-from .serializers import MentorSerializer, MentorListSerializer
-from decorators import ecell_user
-from django.http import HttpResponse
-import csv
+from .serializers import MentorListSerializer
+from rest_framework import status, generics
+from . import responses
 
 
-# TODO: simplify with drf
-@api_view(['GET', ])
-def get_mentors(request, year):
+class MentorView(generics.ListAPIView):
+    permission_classes = [AllowAny, ]
+    queryset = Mentor.objects.all()
+    serializer_class = MentorListSerializer
 
-    res_message = ""
-    res_status = ""
-    res_data = []
+    @swagger_auto_schema(
+        operation_id='get_mentors',
+        responses={
+            '200': set_example(responses.get_mentors_200),
+            '404': set_example(responses.mentors_not_found_404),
+        },
+    )
 
-    mentors = Mentor.objects.filter(year=year, flag=True)
-    if len(mentors) > 0:
-        res_data = MentorListSerializer(
-            mentors, many=True, context={
-                'request': request}).data
-        res_message = "Mentors Fetched successfully."
-        res_status = status.HTTP_200_OK
-    else:
-        res_message = "Mentors Couldn't be fetched"
-        res_status = status.HTTP_404_NOT_FOUND
-
-    return Response({
-        "message": res_message,
-        "data": res_data
-    }, status=res_status)
+    def get(self, request, year):
+        try:
+            queryset = Mentor.objects.filter(year=year, flag=True)
+        except:
+            return Response(responses.mentors_not_found_404, status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = MentorListSerializer(queryset, many=True)
+            data = serializer.data
+            return Response({"message": "Mentors Fetched successfully.", "data": data}, status.HTTP_200_OK)
