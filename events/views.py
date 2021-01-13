@@ -81,7 +81,7 @@ class EventUnregisterView(APIView):
             '404' : set_example(responses.event_does_not_exist_404,responses.event_not_registered_404)
         }
     )
-    def post(request, id):
+    def post(self, request, id):
         user = request.user
         if user:
             try:
@@ -91,12 +91,15 @@ class EventUnregisterView(APIView):
             else:
                 try:
                     reg = EventRegister.objects.filter(user = user, event= event)  
+                    regcount = reg.count()
                 except:
                     return Response(responses.event_not_registered_404,status.HTTP_404_NOT_FOUND)
                 else:
-                    reg.delete()
-                    return Response(responses.event_registration_deleted_200,status.HTTP_200_OK)
-        
+                    if regcount>0:
+                        reg.delete()
+                        return Response(responses.event_registration_deleted_200,status.HTTP_200_OK)
+                    return Response(responses.event_not_registered_404,status.HTTP_404_NOT_FOUND)
+                
         return Response(responses.user_forbidden_403,status.HTTP_403_FORBIDDEN)
 
 
