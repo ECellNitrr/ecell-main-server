@@ -50,7 +50,7 @@ class EventRegisterView(APIView):
             event = Event.objects.get(id=id)
             registeredUser = EventRegister.objects.get(user=user,event=event)
         except:
-            if user:
+            if user.verified:
                 eventregister.user = user
                 try:
                     eventregister.event = Event.objects.get(id=id) 
