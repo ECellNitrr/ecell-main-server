@@ -51,7 +51,7 @@ class EventRegisterView(APIView):
             event = Event.objects.get(id=id)
         except:
             return Response(responses.event_does_not_exist_404, status.HTTP_404_NOT_FOUND)  
-        if user:
+        if user.verified:
             try:
                 registeredUser = EventRegister.objects.get(user=user,event=event)
             except:
