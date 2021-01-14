@@ -37,7 +37,8 @@ class EventRegisterView(APIView):
     @swagger_auto_schema(
         operation_id="event_register",
         responses = {
-            '200': set_example(responses.event_registration_200),
+            '201': set_example(responses.event_registration_201),
+            '200':set_example(responses.user_already_registered_event_200),
             '404':set_example(responses.event_does_not_exist_404),
             '401':set_example(responses.user_unauthorized_401)
         }
@@ -45,17 +46,22 @@ class EventRegisterView(APIView):
     def post(self,request,id):
         user = request.user
         eventregister = EventRegister()
-        if user.verified:
-            eventregister.user = user
-            try:
-                eventregister.event = Event.objects.get(id=id)
-            except:
-                return Response(responses.event_does_not_exist_404, status.HTTP_404_NOT_FOUND)    
-            else:
+        try:
+            event = Event.objects.get(id=id)
+            registeredUser = EventRegister.objects.get(user=user,event=event)
+        except:
+            if user:
+                eventregister.user = user
+                try:
+                    eventregister.event = Event.objects.get(id=id) 
+                except:
+                    return Response(responses.event_does_not_exist_404, status.HTTP_404_NOT_FOUND)    
                 eventregister.save()
-                return Response(responses.event_registration_200,status.HTTP_200_OK)
+                return Response(responses.event_registration_201,HTTP_201_CREATED)
+            else:
+                return Response(responses.user_unauthorized_401,status.HTTP_401_UNAUTHORIZED)
         else:
-            return Response(responses.user_unauthorized_401,status.HTTP_401_UNAUTHORIZED)
+            return Response(responses.user_already_registered_event_200,status.HTTP_200_OK)
 
 # TODO: simplify with drf
 @api_view(['POST', ])

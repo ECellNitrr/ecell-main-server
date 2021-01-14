@@ -25,7 +25,7 @@ events_not_found_404 = {
     "message": "Events couldn't be fetched."
 }
 
-event_registration_200 = {
+event_registration_201 = {
     "message":"Registration Successful"
 }
 
@@ -34,5 +34,9 @@ event_does_not_exist_404 = {
 }
 
 user_unauthorized_401 = {
-  "message":"Unauthorized User"
+  "message":"Please follow OTP verification before registering"
+}
+
+user_already_registered_event_200 = {
+  "message":"You've already registered"
 }
