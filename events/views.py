@@ -46,22 +46,22 @@ class EventRegisterView(APIView):
     def post(self,request,id):
         user = request.user
         eventregister = EventRegister()
+        event = Event.objects.all()
         try:
             event = Event.objects.get(id=id)
-            registeredUser = EventRegister.objects.get(user=user,event=event)
         except:
-            if user.verified:
+            return Response(responses.event_does_not_exist_404, status.HTTP_404_NOT_FOUND)  
+        if user:
+            try:
+                registeredUser = EventRegister.objects.get(user=user,event=event)
+            except:
                 eventregister.user = user
-                try:
-                    eventregister.event = Event.objects.get(id=id) 
-                except:
-                    return Response(responses.event_does_not_exist_404, status.HTTP_404_NOT_FOUND)    
+                eventregister.event = event
                 eventregister.save()
-                return Response(responses.event_registration_201,HTTP_201_CREATED)
-            else:
-                return Response(responses.user_unauthorized_401,status.HTTP_401_UNAUTHORIZED)
+                return Response(responses.event_registration_201,status.HTTP_201_CREATED)
+            return Response(responses.user_already_registered_event_200,status.HTTP_200_OK)    
         else:
-            return Response(responses.user_already_registered_event_200,status.HTTP_200_OK)
+            return Response(responses.user_unauthorized_401,status.HTTP_401_UNAUTHORIZED)
 
 # TODO: simplify with drf
 @api_view(['POST', ])
