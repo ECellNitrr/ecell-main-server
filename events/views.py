@@ -46,7 +46,6 @@ class EventRegisterView(APIView):
     def post(self,request,id):
         user = request.user
         eventregister = EventRegister()
-        event = Event.objects.all()
         try:
             event = Event.objects.get(id=id)
         except:
