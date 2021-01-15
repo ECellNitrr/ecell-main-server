@@ -24,3 +24,19 @@ get_events_200 ={
 events_not_found_404 = {
     "message": "Events couldn't be fetched."
 }
+
+event_registration_201 = {
+    "message":"Registration Successful"
+}
+
+event_does_not_exist_404 = {
+  "message": "Registration Failed. Event does not exist."
+}
+
+user_unauthorized_401 = {
+  "message":"Please follow OTP verification before registering"
+}
+
+user_already_registered_event_200 = {
+  "message":"You've already registered"
+}
