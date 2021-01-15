@@ -55,9 +55,69 @@ verify_otp_400 = {
 }
 
 verify_otp_401 = {
-  "detail": "Authentication credentials were not provided."
+  "detail": [
+      "Authentication credentials were not provided.",
+      "Invalid token."
+  ]
 }
 
+get_user_details_200 = {
+  "first_name": "Sahil",
+  "last_name": "Silare",
+  "email": "sahil@gmail.com",
+  "verified": False,
+  "contact": "",
+  "bquiz_score": 0,
+  "user_type": "GST",
+  "linkedin": "https://www.linkedin.com/in/anshsrtv",
+  "facebook": "https://www.facebook.com/ansh.srivastava.77/",
+  "applied": True,
+  "id": 1
+}
+
+resend_otp_200 = {
+    "message": "An otp has been sent to your mail id to reset your password"
+}
+
+change_mail_200= {
+    "message": "An otp has been sent to new mail id"
+}
+
+check_otp_400 = {
+  "message": {
+    "email": [
+      "Enter a valid email address.",
+      "Email field is required.",
+      "User account with this email id doesn't exist"
+    ],
+    "otp": [
+      "Ensure this field has no more than 4 characters.",
+      "Ensure this field has at least 4 characters."
+      "Invalid OTP!"
+    ]
+  },
+  "verified": False
+}
+
+check_otp_404 = {
+    "message": "User account with this email id doesn't exist",
+    "verified": False
+}
+
+check_otp_200 = {
+    "message":[
+        "Mail verified",
+        "Account already verified"
+    ],
+    "verified": True
+}
+
+apply_for_ca_200 = {
+    "message": [
+        "Congratulations! Applied for CA successfully.",
+        "Already applied!"
+    ]
+}
 forget_password_200 = {
     "detail": "An OTP has been sent to your email."
 }

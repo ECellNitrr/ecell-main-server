@@ -20,10 +20,8 @@ class EventListSerializer(serializers.ModelSerializer):
     no_of_ppl_registered = serializers.SerializerMethodField()
     website_url = serializers.SerializerMethodField()
     
-    # TODO: this method can be simplified further with right implementation 
     def get_website_url(self,obj):
-        req = self.context['request']
-        return '{}://{}/events/{}/'.format(req.scheme, req.get_host() ,obj.id)
+        return config('HOST')+'/events/{}'.format(obj.id)
 
     def get_no_of_ppl_registered(self,obj):
         return obj.eventregister_set.count()
