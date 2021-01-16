@@ -76,7 +76,7 @@ get_user_details_200 = {
 }
 
 resend_otp_200 = {
-    "message": "An otp has been sent to your mail id to reset your password"
+    "message": "An otp has been sent to your mail id."
 }
 
 change_mail_200= {
