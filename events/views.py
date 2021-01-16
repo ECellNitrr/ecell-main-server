@@ -1,4 +1,3 @@
-# TODO: clean imports
 from rest_framework import status
 from rest_framework.decorators import  permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -7,7 +6,6 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from .models import Event, EventRegister
 from .serializers import *
-from decorators import ecell_user
 from drf_yasg.utils import swagger_auto_schema
 from utils.swagger import set_example
 from . import responses
