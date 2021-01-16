@@ -93,11 +93,8 @@ class EventUnregisterView(APIView):
             except:
                 return Response(responses.event_not_registered_404,status.HTTP_404_NOT_FOUND)
             else:
-                if regcount>0:
-                    reg.delete()
-                    return Response(responses.event_registration_deleted_200,status.HTTP_200_OK)
-                return Response(responses.event_not_registered_404,status.HTTP_404_NOT_FOUND)
-            
+                reg.delete()
+                return Response(responses.event_registration_deleted_200,status.HTTP_200_OK)    
 
 # TODO: in next meeting report why this exsits
 class NoticeBoardListView(ListAPIView):
