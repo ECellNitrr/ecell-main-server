@@ -108,3 +108,28 @@ class ChangePasswordSerializer(serializers.Serializer):
         allow_blank=False,
         required=True
     )
+
+class ChangeMailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['email']
+
+class CheckOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        error_messages={
+            "required": "Email field is required.",
+            "invalid" : "Enter a valid email address."
+        },
+        allow_blank=False,
+        required=True
+    )
+    otp = serializers.CharField(
+        error_messages={
+            "required": "OTP field is required.",
+            "invalid": "Ensure this field has no more than 4 characters."
+        },
+        max_length=4,
+        min_length=4,
+        allow_blank=False,
+        required=True
+    )
