@@ -1,7 +1,6 @@
 # TODO: clean imports
 from rest_framework import status
-from rest_framework import response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import  permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
@@ -77,31 +76,28 @@ class EventUnregisterView(APIView):
         operation_id="eventunregister",
         responses={
             '200' : set_example(responses.event_registration_deleted_200),
+            '401' : set_example(responses.user_unauthorized_401),
             '403' : set_example(responses.user_forbidden_403),
-            '404' : set_example(responses.event_does_not_exist_404,responses.event_not_registered_404)
+            '404' : set_example(responses.event_does_not_exist_404)
         }
     )
     def post(self, request, id):
-        user = request.user
-        if user:
+        try:
+            event = Event.objects.get(id=id)
+        except:
+            return Response(responses.event_does_not_exist_404,status.HTTP_404_NOT_FOUND) 
+        else:
             try:
-                event = Event.objects.get(id=id)
+                reg = EventRegister.objects.get(user = request.user, event= event)  
+                regcount = reg.count()
             except:
-                return Response(responses.event_does_not_exist_404,status.HTTP_404_NOT_FOUND) 
+                return Response(responses.event_not_registered_404,status.HTTP_404_NOT_FOUND)
             else:
-                try:
-                    reg = EventRegister.objects.filter(user = user, event= event)  
-                    regcount = reg.count()
-                except:
-                    return Response(responses.event_not_registered_404,status.HTTP_404_NOT_FOUND)
-                else:
-                    if regcount>0:
-                        reg.delete()
-                        return Response(responses.event_registration_deleted_200,status.HTTP_200_OK)
-                    return Response(responses.event_not_registered_404,status.HTTP_404_NOT_FOUND)
-                
-        return Response(responses.user_forbidden_403,status.HTTP_403_FORBIDDEN)
-
+                if regcount>0:
+                    reg.delete()
+                    return Response(responses.event_registration_deleted_200,status.HTTP_200_OK)
+                return Response(responses.event_not_registered_404,status.HTTP_404_NOT_FOUND)
+            
 
 # TODO: in next meeting report why this exsits
 class NoticeBoardListView(ListAPIView):
