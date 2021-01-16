@@ -386,7 +386,7 @@ def request_ca_approval(request):
     user.applied = True
     user.save()
     res_status = status.HTTP_200_OK
-    return Response(responses.apply_for_ca_200, status=res_status)
+    return Response({"message":"Congratulations! Applied for CA successfully."}, status=res_status)
 
 
 
