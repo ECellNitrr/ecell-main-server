@@ -56,6 +56,7 @@ class MentorsListTestCase(APITestCase):
         get_group_api = "/mentors/list/2019/"
         get_client = APIClient()
         response = get_client.get(get_group_api)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['data']), 2)
 
     def test_pass_get_mentors_single(self):
@@ -65,8 +66,9 @@ class MentorsListTestCase(APITestCase):
         get_group_api = "/mentors/list/2020/"
         get_client = APIClient()
         response = get_client.get(get_group_api)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['data']), 1)
-        
+
     def test_pass_get_mentors_empty(self):
         """
         Test with no mentors for a particular year
@@ -74,6 +76,7 @@ class MentorsListTestCase(APITestCase):
         get_group_api = "/mentors/list/2021/"
         get_client = APIClient()
         response = get_client.get(get_group_api)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['data']), 0)
 
     def test_fail_invalid_input(self):
