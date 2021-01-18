@@ -87,7 +87,6 @@ class EventUnregisterView(APIView):
         else:
             try:
                 reg = EventRegister.objects.get(user = request.user, event= event)  
-                regcount = reg.count()
             except:
                 return Response(responses.event_not_registered_404,status.HTTP_404_NOT_FOUND)
             else:
