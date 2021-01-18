@@ -10,7 +10,8 @@ from drf_yasg.utils import swagger_auto_schema
 from utils.swagger import set_example
 from . import responses
 # from django.utils.six.moves.urllib.parse import urlsplit
-import csv
+from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework import status, generics
 
 class EventView(generics.ListAPIView):
     permission_classes = [AllowAny, ]
@@ -75,7 +76,6 @@ class EventUnregisterView(APIView):
         responses={
             '200' : set_example(responses.event_registration_deleted_200),
             '401' : set_example(responses.user_unauthorized_401),
-            '403' : set_example(responses.user_forbidden_403),
             '404' : set_example(responses.event_does_not_exist_404)
         }
     )
