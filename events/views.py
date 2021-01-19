@@ -67,7 +67,6 @@ class EventRegisterView(APIView):
 
         return Response(responses.user_unauthorized_401,status.HTTP_401_UNAUTHORIZED)
 
-# TODO: simplify with drf
 class EventUnregisterView(APIView):
     permission_classes = [IsAuthenticated]
     @swagger_auto_schema(
