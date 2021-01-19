@@ -44,3 +44,6 @@ user_already_registered_event_200 = {
 event_registration_deleted_200 = {
   "message" : "Event unregistered successfully"
 }
+event_not_registered_404 = {
+  "message" : "Event is not registered"
+}
