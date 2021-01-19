@@ -4,6 +4,14 @@ dist: xenial
 python:
   - 3.6
 
+env:
+  SECRET_KEY: sample_secret_key
+  DB_TYPE: 'sqlite3'
+  DEBUG: 'True'
+  MOCK_SMS_EMAIL: 'True'
+  AWS_SECRET_ACCESS_KEY: 'your_aws_secret_access_key'
+  AWS_ACCESS_KEY_ID: 'your_aws_access_key_id'
+
 install:
   - pip install -r requirements.txt
 
