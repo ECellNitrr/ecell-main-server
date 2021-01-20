@@ -61,7 +61,7 @@ class EventsListTestCase(APITestCase):
             year=2020,
         )
 
-    def test_pass_get_mentors_many(self):
+    def test_pass_get_events_many(self):
         """
         Test for mulitple events
         """
