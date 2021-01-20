@@ -6,6 +6,7 @@ python:
 
 env:
   SECRET_KEY: sample_secret_key
+  HOST: "*"
   DB_TYPE: 'sqlite3'
   DEBUG: 'True'
   MOCK_SMS_EMAIL: 'True'
