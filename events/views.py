@@ -7,7 +7,6 @@ from .serializers import *
 from drf_yasg.utils import swagger_auto_schema
 from utils.swagger import set_example
 from . import responses
-# from django.utils.six.moves.urllib.parse import urlsplit
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import status, generics
 
