@@ -326,6 +326,7 @@ def change_mail(request):
         otp = send_email_otp([new_email])
         user.otp = otp
         user.email = new_email
+        user.username = new_email
         user.verified = False
         user.save()
         # Verification to be done in check_otp.
