@@ -3,6 +3,14 @@ version: "3.6"
 services:
 
   web:
+    environment:
+      - SECRET_KEY=sample_secret_key
+      - HOST="*"
+      - DB_TYPE=sqlite3
+      - DEBUG=True
+      - MOCK_SMS_EMAIL=True
+      - AWS_SECRET_ACCESS_KEY='your_aws_secret_access_key'
+      - AWS_ACCESS_KEY_ID='your_aws_access_key_id'
     build: .
     command: bash -c "python manage.py makemigrations && python manage.py migrate && python3 manage.py test && python manage.py runserver 0.0.0.0:8000"
 
