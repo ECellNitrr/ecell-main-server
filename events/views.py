@@ -5,10 +5,6 @@ from rest_framework.views import APIView
 from .models import Event, EventRegister
 from .serializers import *
 from drf_yasg.utils import swagger_auto_schema
-<<<<<<< HEAD
-from rest_framework.permissions import AllowAny,IsAuthenticated
-=======
->>>>>>> e8bf5e4fb5d6e7d738b44ee190246ab4c2b89859
 from utils.swagger import set_example
 from rest_framework.views import APIView
 from . import responses
