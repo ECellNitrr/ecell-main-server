@@ -1,17 +1,25 @@
-# TODO: remove unwnted imports
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAdminUser
-from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from .models import Speaker
-from .serializers import SpeakerSerializer, SpeakerListSerializer
-from decorators import ecell_user
-from django.http import HttpResponse, JsonResponse
-import csv
+from .serializers import SpeakerSerializer
+from django.http import JsonResponse
+from utils.swagger import set_example
+from drf_yasg.utils import swagger_auto_schema
+from . import responses
 
 
-@api_view(['GET', ])
+@swagger_auto_schema(
+    operation_id='get_speakers',
+    method='get',
+    responses={
+        '200': set_example(responses.get_speakers_200)
+    }
+)
+@api_view(['get'])
 def get_speakers_list(request):
     speakers_objs = Speaker.objects.all()
     speakers = SpeakerSerializer(speakers_objs, many=True).data
-    return JsonResponse(speakers,safe=False)
+    response = {
+        "message": "Speakers Fetched Successfully",
+        "data": speakers
+    }
+    return JsonResponse(response,safe=False)

@@ -43,8 +43,8 @@ class CustomUser(AbstractUser):
                                  default='GST')
     linkedin = models.URLField(max_length=64, null=True, blank=True)
     facebook = models.URLField(max_length=64, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now=True, editable=False)
-    modified_at = models.DateTimeField(auto_now_add=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True, editable=False)
 
     @property
     def last_modified(self):
