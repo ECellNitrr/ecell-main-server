@@ -38,7 +38,7 @@ class UserRegisterTestCase(APITestCase):
         response = self.client.post("/users/register/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_fail_incorret_email(self):
+    def test_fail_incorrect_email(self):
         data = {
             "first_name": "string1",
             "last_name":"str2",
