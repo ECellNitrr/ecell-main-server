@@ -12,7 +12,7 @@ services:
       - AWS_SECRET_ACCESS_KEY='your_aws_secret_access_key'
       - AWS_ACCESS_KEY_ID='your_aws_access_key_id'
     build: .
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && python3 manage.py test && python manage.py runserver 0.0.0.0:5000"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python3 manage.py test && python manage.py runserver 0.0.0.0:3000"
 
     volumes:
       - .:/code
