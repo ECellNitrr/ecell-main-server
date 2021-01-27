@@ -23,11 +23,11 @@ class UserRegisterTestCase(APITestCase):
             "password": "string989"
         }
 
-        response = self.client.post("/users/register/", data)
+        response = self.client.post("/users/register/", data) 
         response = self.client.post("/users/register/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_fail_without_fields(self):
+    def test_fail_without_lastname(self):
         data = {
             "first_name": "string1",
             "email": "user1@example.com",
