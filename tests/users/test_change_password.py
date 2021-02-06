@@ -107,7 +107,7 @@ class ChangePasswordTestCase(APITestCase):
             "password" : self.password
         }
         response2 = self.client.post("/users/login/", data1)
-        self.assertEqual(response1.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(response2.status_code, status.HTTP_202_ACCEPTED)
 
     def test_fail_incorrect_otp(self):
         '''
