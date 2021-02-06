@@ -1,4 +1,4 @@
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 from rest_framework import status
 from users.models import CustomUser
 
@@ -126,3 +126,4 @@ class ChangePasswordTestCase(APITestCase):
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
