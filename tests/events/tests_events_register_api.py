@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from events.models import Event,EventRegister
+from events.models import Event
 from users.models import CustomUser
 
 class EventRegisterTestCase(APITestCase):
@@ -8,27 +8,45 @@ class EventRegisterTestCase(APITestCase):
         """
         Create different events with different years and flag input in test database
         """
-        self.registered_event = EventRegister.objects.create(
-            id=1,
-            user=1,
-            event=1
-        )
-
-        self.user1= CustomUser.objects.create(
-            id=0,
-            email="test@email.com",
-            username="test1",
+        # create an unverifeid authenticated user
+        self.auth_unverified_user_email = "crash.test1.dummy@gmail.com"
+        self.auth_unverified_user_password = "test1.modelx"
+        self.auth_unverified_user = CustomUser.objects.create_user(
+            email = self.auth_unverified_user_email,
+            username = self.auth_unverified_user_email,
+            password = self.auth_unverified_user_password,
             verified=False
         )
-
-        self.user2= CustomUser.objects.create(
-            id=1,
-            email="test2@email.com",
-            username="test2",
+        
+        # create an verified authenticated user
+        self.auth_verified_user_email = "crash.test2.dummy@gmail.com"
+        self.auth_verified_user_password = "test2.modelx"
+        self.auth_verified_user = CustomUser.objects.create_user(
+            email = self.auth_verified_user_email,
+            username = self.auth_verified_user_email,
+            password = self.auth_verified_user_password,
             verified=True
         )
 
-        self.event1 = Event.objects.create(
+        login_api="/users/login/"
+        client = APIClient()
+        # get auth token of unverified user
+        unverified_login_payload = {
+            'email':self.auth_unverified_user_email,
+            'password':self.auth_unverified_user_password
+        }
+        unverified_login_response = client.post(login_api,unverified_login_payload)
+        self.unverified_auth_token = unverified_login_response.data['token']
+        
+        # get auth token of verified user
+        verified_login_payload = {
+            'email':self.auth_verified_user_email,
+            'password':self.auth_verified_user_password
+        }
+        verified_login_response = client.post(login_api,verified_login_payload)
+        self.verified_auth_token = verified_login_response.data['token']
+        
+        self.event = Event.objects.create(
             id=1,
             name= "test1",
             venue = "test_venue",
@@ -48,6 +66,7 @@ class EventRegisterTestCase(APITestCase):
         """ 
         post_register_event_api = "/events/register/twentieth/"
         get_client = APIClient()
+        get_client.credentials(HTTP_AUTHORIZATION=self.verified_auth_token)
         response = get_client.post(post_register_event_api)
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND)
 
@@ -64,25 +83,34 @@ class EventRegisterTestCase(APITestCase):
         """
         Test with unverified user
         """  
-        post_register_event_api = "/events/register/0/"
+        post_register_event_api = "/events/register/1/"
         get_client = APIClient()
-        user = {'id':0,'email':'test1@email.com','username':'test1','verified':False}
-        response = get_client.post(post_register_event_api,user,format='json')
+        get_client.credentials(HTTP_AUTHORIZATION=self.unverified_auth_token)
+        response = get_client.post(post_register_event_api)
         self.assertEqual(response.status_code,status.HTTP_401_UNAUTHORIZED)
 
 
-    def test_pass_reregisteration(self):    
+    def test_pass_registeration(self):    
         """
-        Test with reregisteration
+        Test with registeration
         """
         post_register_event_api = "/events/register/1/"
         get_client = APIClient()
-        user = {'id':1,'email':'test2@email.com','username':'test2','verified':True}
-        response = get_client.post(post_register_event_api,user,format='json')
-        self.assertEqual(response.status_code,status.HTTP_401_UNAUTHORIZED)
+        get_client.credentials(HTTP_AUTHORIZATION=self.verified_auth_token)
+        response = get_client.post(post_register_event_api)
+        self.assertEqual(response.status_code,status.HTTP_201_CREATED)
+
+    def test_pass_event_not_found(self):    
+        """
+        Test with event not found
+        """
+        post_register_event_api = "/events/register/0/"
+        get_client = APIClient()
+        get_client.credentials(HTTP_AUTHORIZATION=self.verified_auth_token)
+        response = get_client.post(post_register_event_api)
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND)    
 
     def tearDown(self):
-        self.registered_event.delete()
-        self.user1.delete()
-        self.user2.delete()
-        self.event1.delete()
+        self.event.delete()
+        self.auth_unverified_user.delete()
+        self.auth_verified_user.delete()
