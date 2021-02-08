@@ -9,8 +9,8 @@ class ChangePasswordTestCase(APITestCase):
     '''
     def setUp(self):
         self.email = "test@gmail.com"
-        self.password = "new_password"
-        self.otp = "invalid_otp"
+        self.new_password = "new_password"
+        self.invalid_otp = "invalid_otp"
 
         self.user = CustomUser.objects.create_user(
             email = self.email,
@@ -30,8 +30,8 @@ class ChangePasswordTestCase(APITestCase):
         '''
         data = {
             "email" : 'wrong.email.com',
-            "password" : self.password,
-            "otp" : self.otp
+            "password" : self.new_password,
+            "otp" : self.invalid_otp
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -41,8 +41,8 @@ class ChangePasswordTestCase(APITestCase):
             Test without email field
         '''
         data = {
-            "password" : self.password,
-            "otp" : self.otp
+            "password" : self.new_password,
+            "otp" : self.invalid_otp
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -53,8 +53,8 @@ class ChangePasswordTestCase(APITestCase):
         '''
         data = {
             "email" : "unregistermail@gmail.com",
-            "password" : self.password,
-            "otp" : self.otp
+            "password" : self.new_password,
+            "otp" : self.invalid_otp
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -65,8 +65,8 @@ class ChangePasswordTestCase(APITestCase):
         '''
         data = {
             "email" : "",
-            "password" : self.password,
-            "otp" : self.otp
+            "password" : self.new_password,
+            "otp" : self.invalid_otp
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -77,7 +77,7 @@ class ChangePasswordTestCase(APITestCase):
         '''
         data = {
             "email" : self.email,
-            "otp" : self.otp
+            "otp" : self.invalid_otp
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -89,7 +89,7 @@ class ChangePasswordTestCase(APITestCase):
         data = {
             "email": self.email,
             "password": 'small',
-            "otp": self.otp
+            "otp": self.invalid_otp
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -101,7 +101,7 @@ class ChangePasswordTestCase(APITestCase):
         data = {
             "email": self.email,
             "password": '',
-            "otp": self.otp
+            "otp": self.invalid_otp
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -112,7 +112,7 @@ class ChangePasswordTestCase(APITestCase):
         '''
         data = {
             "email" : self.email,
-            "password" : self.password
+            "password" : self.new_password
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -123,7 +123,7 @@ class ChangePasswordTestCase(APITestCase):
         '''
         data = {
             "email" : self.email,
-            "password" : self.password,
+            "password" : self.new_password,
             "otp": '',
         }
         response = self.client.post("/users/change_password/", data)
@@ -141,8 +141,8 @@ class ChangePasswordTestCase(APITestCase):
         user = CustomUser.objects.get(email=self.email)
         data = {
             "email": self.email,
-            "password": self.password,
-            "otp": self.otp
+            "password": self.new_password,
+            "otp": self.invalid_otp
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -159,7 +159,7 @@ class ChangePasswordTestCase(APITestCase):
         user = CustomUser.objects.get(email=self.email)
         data = {
             "email": self.email,
-            "password": self.password,
+            "password": self.new_password,
             "otp": user.otp
         }
         response = self.client.post("/users/change_password/", data)
@@ -170,7 +170,7 @@ class ChangePasswordTestCase(APITestCase):
         '''
         data1 = {
             "email" : self.email,
-            "password" : self.password
+            "password" : self.new_password
         }
         login_response = self.client.post("/users/login/", data1)
         self.assertEqual(login_response.status_code, status.HTTP_202_ACCEPTED)
