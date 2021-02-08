@@ -9,8 +9,8 @@ class ChangePasswordTestCase(APITestCase):
     '''
     def setUp(self):
         self.email = "test@gmail.com"
-        self.password = "testmode"
-        self.otp = "1234"
+        self.password = "new_password"
+        self.otp = "invalid_otp"
 
         self.user = CustomUser.objects.create_user(
             email = self.email,
@@ -18,7 +18,7 @@ class ChangePasswordTestCase(APITestCase):
             first_name = "test",
             last_name = "ltest",
             contact = "+919999999999",
-            password = "password"
+            password = "old_password"
         )
 
     def tearDown(self):
@@ -47,6 +47,30 @@ class ChangePasswordTestCase(APITestCase):
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_fail_unregistered_email(self):
+        '''
+            Test for unregistered email
+        '''
+        data = {
+            "email" : "unregistermail@gmail.com",
+            "password" : self.password,
+            "otp" : self.otp
+        }
+        response = self.client.post("/users/change_password/", data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_fail_blank_email(self):
+        '''
+            Test for unregistered email
+        '''
+        data = {
+            "email" : "",
+            "password" : self.password,
+            "otp" : self.otp
+        }
+        response = self.client.post("/users/change_password/", data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_fail_without_password(self):
         '''
             Test without password field
@@ -54,6 +78,30 @@ class ChangePasswordTestCase(APITestCase):
         data = {
             "email" : self.email,
             "otp" : self.otp
+        }
+        response = self.client.post("/users/change_password/", data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_fail_smallpassword(self):
+        '''
+            Test with small password field
+        '''
+        data = {
+            "email": self.email,
+            "password": 'small',
+            "otp": self.otp
+        }
+        response = self.client.post("/users/change_password/", data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_fail_blank_password(self):
+        '''
+            Test with blank password field
+        '''
+        data = {
+            "email": self.email,
+            "password": '',
+            "otp": self.otp
         }
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -69,23 +117,41 @@ class ChangePasswordTestCase(APITestCase):
         response = self.client.post("/users/change_password/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_fail_unregistered_email(self):
+    def test_fail_blank_otp(self):
         '''
-            Test for unregistered email
+            Test without otp field
         '''
         data = {
-            "email" : "unregistermail@gmail.com",
+            "email" : self.email,
             "password" : self.password,
-            "otp" : self.otp
+            "otp": '',
         }
         response = self.client.post("/users/change_password/", data)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_fail_incorrect_otp(self):
+        '''
+            Generating otp using forgot_password api
+        '''
+        forget_pswd_response = self.client.post("/users/forgot_password/", {"email": self.email})
+
+        '''
+            Checking the credentials and get the user
+        '''
+        user = CustomUser.objects.get(email=self.email)
+        data = {
+            "email": self.email,
+            "password": self.password,
+            "otp": self.otp
+        }
+        response = self.client.post("/users/change_password/", data)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_success_with_correctdata(self):
         '''
             Generating otp using forgot_password api
         '''
-        response1 = self.client.post("/users/forgot_password/", {"email" : self.email})
+        forgot_pswd_response = self.client.post("/users/forgot_password/", {"email" : self.email})
 
         '''
             Checking the credentials and get the user
@@ -106,24 +172,5 @@ class ChangePasswordTestCase(APITestCase):
             "email" : self.email,
             "password" : self.password
         }
-        response2 = self.client.post("/users/login/", data1)
-        self.assertEqual(response2.status_code, status.HTTP_202_ACCEPTED)
-
-    def test_fail_incorrect_otp(self):
-        '''
-            Generating otp using forgot_password api
-        '''
-        response1 = self.client.post("/users/forgot_password/", {"email": self.email})
-
-        '''
-            Checking the credentials and get the user
-        '''
-        user = CustomUser.objects.get(email=self.email)
-        data = {
-            "email": self.email,
-            "password": self.password,
-            "otp": self.otp
-        }
-        response = self.client.post("/users/change_password/", data)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        
+        login_response = self.client.post("/users/login/", data1)
+        self.assertEqual(login_response.status_code, status.HTTP_202_ACCEPTED)
