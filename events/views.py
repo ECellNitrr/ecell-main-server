@@ -6,7 +6,6 @@ from .models import Event, EventRegister
 from .serializers import *
 from drf_yasg.utils import swagger_auto_schema
 from utils.swagger import set_example
-from rest_framework.views import APIView
 from . import responses
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import status, generics

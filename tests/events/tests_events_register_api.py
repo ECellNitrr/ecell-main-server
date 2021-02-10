@@ -60,9 +60,9 @@ class EventRegisterTestCase(APITestCase):
             year = 2019,
         )
 
-    def test_pass_invalid_input(self):
+    def test_fail_invalid_endpoint(self):
         """
-        Test with invalid input
+        Test with invalid endpoint
         """ 
         post_register_event_api = "/events/register/twentieth/"
         get_client = APIClient()
@@ -70,16 +70,16 @@ class EventRegisterTestCase(APITestCase):
         response = get_client.post(post_register_event_api)
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND)
 
-    def test_pass_unauthorized_user(self):
+    def test_fail_unauthenticated_user(self):
         """
-        Test with unauthroized user
+        Test with unauthenticated user
         """
-        post_register_event_api = "/events/register/0/"
+        post_register_event_api = "/events/register/1/"
         get_client = APIClient()
         response = get_client.post(post_register_event_api)
         self.assertEqual(response.status_code,status.HTTP_401_UNAUTHORIZED)
 
-    def test_pass_unverified_user(self):
+    def test_fail_unverified_user(self):
         """
         Test with unverified user
         """  
@@ -100,7 +100,7 @@ class EventRegisterTestCase(APITestCase):
         response = get_client.post(post_register_event_api)
         self.assertEqual(response.status_code,status.HTTP_201_CREATED)
 
-    def test_pass_event_not_found(self):    
+    def test_fail_event_not_found(self):    
         """
         Test with event not found
         """
