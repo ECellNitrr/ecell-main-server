@@ -1,43 +1,20 @@
 from users.models import CustomUser
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
+from tests.AuthAPITestCase import AuthAPITestCase
 
-class VerifyOTPTestCase(APITestCase):
+class VerifyOTPTestCase(AuthAPITestCase):
 
     verify_otp_api = '/users/verify_otp/'
 
     def setUp(self):
-        self.email = "crash.test.dummy@gmail.com"
-        self.password = "test.modelx"
-
-        self.user = CustomUser.objects.create_user(
-            email = self.email,
-            username = self.email,
-            first_name = "Crash",
-            last_name = "Test",
-            contact = "+919999999999",
-            password = self.password,
-            otp = "1234"
-        )
-
-    def create_auth_client(self):
-        login_api = "/users/login/"
-        login_payload = {
-            'email': self.email,
-            'password': self.password
-        }
-
-        auth_client = APIClient()
-        login_response = auth_client.post(login_api, login_payload)
-        auth_token = login_response.data['token']
-        auth_client.credentials(HTTP_AUTHORIZATION=auth_token)
-        return auth_client
+        super(VerifyOTPTestCase,self).setUp()
 
     #Unauth user test fail
     def test_fail_unauth_user(self):
         unauth_client = APIClient()
         data = {
-            "otp" : self.user.otp
+            "otp" : self.auth_user.otp
         }
         response = unauth_client.post(self.verify_otp_api,data)
         self.assertEqual(response.status_code,status.HTTP_401_UNAUTHORIZED)
@@ -62,7 +39,7 @@ class VerifyOTPTestCase(APITestCase):
     def test_pass_correct_otp(self):
         auth_client = self.create_auth_client()
         data = {
-            "otp" : self.user.otp
+            "otp" : self.auth_user.otp
         }
         response = auth_client.post(self.verify_otp_api,data)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
@@ -71,11 +48,10 @@ class VerifyOTPTestCase(APITestCase):
     def test_fail_already_verified(self):
         auth_client = self.create_auth_client()
         data = {
-            "otp" : self.user.otp
+            "otp" : self.auth_user.otp
         }
         response = auth_client.post(self.verify_otp_api,data)
+        
+        # Trying to Verify again
         response = auth_client.post(self.verify_otp_api,data)
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
-
-    def tearDown(self):
-        self.user.delete()
