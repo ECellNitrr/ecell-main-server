@@ -2,9 +2,11 @@ from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from events.models import Event
 from users.models import CustomUser
+from tests.AuthAPITestCase import AuthAPITestCase
 
-class EventRegisterTestCase(APITestCase):
+class EventRegisterTestCase(AuthAPITestCase):
     def setUp(self):
+        super(EventRegisterTestCase,self).setUp()
         """
         Create different events with different years and flag input in test database
         """
@@ -27,17 +29,9 @@ class EventRegisterTestCase(APITestCase):
             password = self.auth_verified_user_password,
             verified=True
         )
-
+        
         login_api="/users/login/"
         client = APIClient()
-        # get auth token of unverified user
-        unverified_login_payload = {
-            'email':self.auth_unverified_user_email,
-            'password':self.auth_unverified_user_password
-        }
-        unverified_login_response = client.post(login_api,unverified_login_payload)
-        self.unverified_auth_token = unverified_login_response.data['token']
-        
         # get auth token of verified user
         verified_login_payload = {
             'email':self.auth_verified_user_email,
@@ -84,8 +78,7 @@ class EventRegisterTestCase(APITestCase):
         Test with unverified user
         """  
         post_register_event_api = "/events/register/1/"
-        get_client = APIClient()
-        get_client.credentials(HTTP_AUTHORIZATION=self.unverified_auth_token)
+        get_client = self.create_auth_client()
         response = get_client.post(post_register_event_api)
         self.assertEqual(response.status_code,status.HTTP_401_UNAUTHORIZED)
 
