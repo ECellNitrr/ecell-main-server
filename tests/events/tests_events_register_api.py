@@ -30,15 +30,6 @@ class EventRegisterTestCase(AuthAPITestCase):
             verified=True
         )
         
-        login_api="/users/login/"
-        client = APIClient()
-        # get auth token of verified user
-        verified_login_payload = {
-            'email':self.auth_verified_user_email,
-            'password':self.auth_verified_user_password
-        }
-        verified_login_response = client.post(login_api,verified_login_payload)
-        self.verified_auth_token = verified_login_response.data['token']
         
         self.event = Event.objects.create(
             id=1,
@@ -59,9 +50,8 @@ class EventRegisterTestCase(AuthAPITestCase):
         Test with invalid endpoint
         """ 
         post_register_event_api = "/events/register/twentieth/"
-        get_client = APIClient()
-        get_client.credentials(HTTP_AUTHORIZATION=self.verified_auth_token)
-        response = get_client.post(post_register_event_api)
+        verified_auth_client = self.create_verified_auth_client()
+        response = verified_auth_client.post(post_register_event_api)
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND)
 
     def test_fail_unauthenticated_user(self):
@@ -88,9 +78,8 @@ class EventRegisterTestCase(AuthAPITestCase):
         Test with registeration
         """
         post_register_event_api = "/events/register/1/"
-        get_client = APIClient()
-        get_client.credentials(HTTP_AUTHORIZATION=self.verified_auth_token)
-        response = get_client.post(post_register_event_api)
+        verified_auth_client = self.create_verified_auth_client()
+        response = verified_auth_client.post(post_register_event_api)
         self.assertEqual(response.status_code,status.HTTP_201_CREATED)
 
     def test_fail_event_not_found(self):    
@@ -98,9 +87,8 @@ class EventRegisterTestCase(AuthAPITestCase):
         Test with event not found
         """
         post_register_event_api = "/events/register/0/"
-        get_client = APIClient()
-        get_client.credentials(HTTP_AUTHORIZATION=self.verified_auth_token)
-        response = get_client.post(post_register_event_api)
+        verified_auth_client = self.create_verified_auth_client()
+        response = verified_auth_client.post(post_register_event_api)
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND)    
 
     def tearDown(self):
