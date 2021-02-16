@@ -10,26 +10,6 @@ class EventRegisterTestCase(AuthAPITestCase):
         """
         Create different events with different years and flag input in test database
         """
-        # create an unverifeid authenticated user
-        self.auth_unverified_user_email = "crash.test1.dummy@gmail.com"
-        self.auth_unverified_user_password = "test1.modelx"
-        self.auth_unverified_user = CustomUser.objects.create_user(
-            email = self.auth_unverified_user_email,
-            username = self.auth_unverified_user_email,
-            password = self.auth_unverified_user_password,
-            verified=False
-        )
-        
-        # create an verified authenticated user
-        self.auth_verified_user_email = "crash.test2.dummy@gmail.com"
-        self.auth_verified_user_password = "test2.modelx"
-        self.auth_verified_user = CustomUser.objects.create_user(
-            email = self.auth_verified_user_email,
-            username = self.auth_verified_user_email,
-            password = self.auth_verified_user_password,
-            verified=True
-        )
-        
         
         self.event = Event.objects.create(
             id=1,
@@ -86,12 +66,20 @@ class EventRegisterTestCase(AuthAPITestCase):
         """
         Test with event not found
         """
-        post_register_event_api = "/events/register/0/"
+        post_register_event_api = "/events/register/12345/"
         verified_auth_client = self.create_verified_auth_client()
         response = verified_auth_client.post(post_register_event_api)
-        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND)    
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND) 
+
+    def test_pass_re_registeration(self):
+        """
+        Test with re-registeration
+        """       
+        post_register_event_api = "/events/register/1/"
+        verified_auth_client = self.create_verified_auth_client()
+        response_registeration = verified_auth_client.post(post_register_event_api)
+        response_re_registeration = verified_auth_client.post(post_register_event_api)
+        self.assertEqual(response_re_registeration.status_code,status.HTTP_200_OK)
 
     def tearDown(self):
         self.event.delete()
-        self.auth_unverified_user.delete()
-        self.auth_verified_user.delete()
