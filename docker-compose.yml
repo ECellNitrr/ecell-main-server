@@ -6,7 +6,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: datapostgres
       MYSQL_DATABASE: ecell_main_server_db
-      MYSQL_USER: backend
+      MYSQL_USER: root
       MYSQL_PASSWORD: datapostgres
     image: mysql:5.7
     volumes:
