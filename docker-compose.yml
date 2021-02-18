@@ -6,22 +6,8 @@ services:
     image: mysql:5.7
     volumes:
        - db_data:/var/lib/mysql
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
-      MYSQL_DATABASE: ecell_main_server_db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: datapostgres
 
   web:
-    environment:
-      - SECRET_KEY=sample_secret_key
-      - HOST="*"
-      - DB_TYPE=sqlite
-      - DEBUG=True
-      - MOCK_SMS_EMAIL=True
-      - AWS_SECRET_ACCESS_KEY='your_aws_secret_access_key'
-      - AWS_ACCESS_KEY_ID='your_aws_access_key_id'
-      - PYTHONDONTWRITEBYTECODE=1
     build: .
     command: bash -c "python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:3000"
 
