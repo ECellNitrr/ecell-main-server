@@ -2,21 +2,22 @@ version: "3.6"
    
 services:
 
+  db:
+    image: mysql:5.7
+    volumes:
+       - db_data:/var/lib/mysql
+
   web:
-    environment:
-      - SECRET_KEY=sample_secret_key
-      - HOST="*"
-      - DB_TYPE=sqlite3
-      - DEBUG=True
-      - MOCK_SMS_EMAIL=True
-      - AWS_SECRET_ACCESS_KEY='your_aws_secret_access_key'
-      - AWS_ACCESS_KEY_ID='your_aws_access_key_id'
-      - PYTHONDONTWRITEBYTECODE=1
     build: .
-    command: bash -c "python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py test && python3 manage.py runserver 0.0.0.0:3000"
+    command: bash -c "python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:3000"
 
     volumes:
       - .:/code
     ports:
       - "3000:3000"
-    
+
+    depends_on:
+      - db
+  
+volumes:
+  db_data: {}

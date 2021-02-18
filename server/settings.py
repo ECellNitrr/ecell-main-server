@@ -103,12 +103,12 @@ if config('DB_TYPE')=='sqlite3':
 else:
     DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.msql',
-        'NAME': config('db_name',None),
-        'USER': config('db_user',None),
-        'PASSWORD': config('db_password',None),
-        'HOST': 'localhost',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('MYSQL_DATABASE',None),
+        'USER': config('MYSQL_USER',None),
+        'PASSWORD': config('MYSQL_PASSWORD',None),
+        'HOST': 'db',
+        'PORT': config('DB_PORT',None),
     },
 }
 
