@@ -3,6 +3,7 @@ from decouple import config
 from users.models import CustomUser
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 
 NO_TOKEN = Response({
                 "message":"No Token Provided!"
@@ -15,17 +16,25 @@ DOES_NOT_EXIST = Response({
 ACCESS_ERROR = Response({
                     "message": "You are not authorized to use this API"
             }, status=status.HTTP_401_UNAUTHORIZED)
+PREFIX = 'Token'
 
+def get_token(header):
+    bearer, _, token = header.partition(' ')
+    if bearer != PREFIX:
+        raise ValueError('Invalid token')
+
+    return token
 def ecell_user(function):
     def wrap(request, *args, **kwargs):
         token = request.META.get("HTTP_AUTHORIZATION", None)
+        token = get_token(token)
         if token is not None: 
             try:
-                payload = jwt.decode(token, config('SECRET_KEY'))
+                payload = Token.objects.get(key=token).user
             except:
                 return DOES_NOT_EXIST
             else:
-                ecell_user_email = payload['email']
+                ecell_user_email = payload.email
                 try:
                     ecell_user = CustomUser.objects.get(email=ecell_user_email)
                 except:
@@ -46,16 +55,17 @@ def client_check(function):
     def wrap(request, *args, **kwargs):
         # print(request.META['Access'])
         token = request.META.get("HTTP_ACCESS", None)
-        print(token)
+        token = get_token(token)
+        # print(token)
         if token is not None: 
             try:
-                payload = jwt.decode(token, config('SECRET_KEY'))
+                payload = Token.objects.get(key=token).user
             except Exception as e:
                 return ACCESS_ERROR
             else:
                 print(payload)
-                client = payload['client']
-                organization = payload['organization']
+                client = payload.client
+                organization = payload.organization
                 
                 if client!='android' or organization!='ECell':
                     return ACCESS_ERROR
@@ -70,10 +80,14 @@ def client_check(function):
     return wrap
 
 def get_user(token):
-    payload = jwt.decode(token, config('SECRET_KEY'))
-    ecell_user_email = payload['email']
-    ecell_user = CustomUser.objects.get(email=ecell_user_email)
-    return ecell_user
+    try:
+        payload = Token.objects.get(key=token).user
+    except Exception as e:
+        return DOES_NOT_EXIST
+    else:
+        ecell_user_email = payload.email
+        ecell_user = CustomUser.objects.get(email=ecell_user_email)
+        return ecell_user
 
 def relax_ecell_user(function):
     def wrap(request, *args, **kwargs):
@@ -82,6 +96,7 @@ def relax_ecell_user(function):
         # authenticate the post request via hidden input field
         token = request.POST.get('token') or request.POST.get('Token')  
         token = request.META.get("HTTP_AUTHORIZATION", None) if not token else token
+        token = get_token(token)
         if token is not None: 
             request.ecelluser = get_user(token)
 

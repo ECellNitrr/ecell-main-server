@@ -17,4 +17,4 @@ class LeaderSerializer(serializers.ModelSerializer):
 class UserLeaderBoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username','email','score']
+        fields = ['username','email','bquiz_score']
