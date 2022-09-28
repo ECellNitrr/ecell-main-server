@@ -71,14 +71,14 @@ def get_daily_leaderboard(request):
 
     return Response({
         'message':'Leaderboard Fetched Successfully!',
-        'data':leaderboard
+        'data': leaderboard
     }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_leaderboard(request):
     try:
-        users = CustomUser.objects.filter(bquiz_score>0).order_by('-bquiz_score')
-        leaderboard = UserLeaderBoardSerializer(users, many=True)
+        users = CustomUser.objects.filter(bquiz_score__gt=0).order_by('-bquiz_score')
+        leaderboard = UserLeaderBoardSerializer(users, many=True).data
     except:
         return Response({
             'message':'Error Fetching Leaderboard!',
@@ -86,7 +86,7 @@ def get_leaderboard(request):
 
     return Response({
         'message':'Leaderboard Fetched Successfully!',
-        'data':leaderboard
+        'data': leaderboard
     }, status=status.HTTP_200_OK)
     
 @api_view(['GET'])
