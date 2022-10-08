@@ -107,7 +107,7 @@ else:
         'NAME': config('MYSQL_DATABASE',None),
         'USER': config('MYSQL_USER',None),
         'PASSWORD': config('MYSQL_PASSWORD',None),
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': config('DB_PORT',None),
     },
 }
