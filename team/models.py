@@ -20,6 +20,7 @@ class Member(models.Model):
         ['pr']*2,
         ['doc']*2,
         ['design']*2,
+        ['em']*2,
         ['none']*2
     ]
 
