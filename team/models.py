@@ -21,6 +21,7 @@ class Member(models.Model):
         ['doc']*2,
         ['design']*2,
         ['em']*2,
+        ['ve']*2,
         ['none']*2
     ]
 
