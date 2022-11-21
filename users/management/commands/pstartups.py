@@ -17,6 +17,8 @@ SPONS_TYPE = {
     'Associate Sponsors': 'ATS',
     'Platinum Sponsors': 'PLS',
     'Gold Sponsors': 'GDS',
+    'Silver Sponsors': 'SLS',
+    'Bronze Sponsors': 'BRS',
     'Title Sponsors': 'TLS',
     'Partner Sponsors': 'PRS',
 }

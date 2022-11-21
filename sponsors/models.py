@@ -19,9 +19,17 @@ spons_types = {
         'display_name': 'Gold',
         'importance': 7,
     },
+    'SLS': {
+        'display_name': 'Silver',
+        'importance': 6,
+    },
+    'BRS': {
+        'display_name': 'Bronze',
+        'importance': 5,
+    },
     'PRS': {
         'display_name': 'Partner',
-        'importance': 6,
+        'importance': 4,
     },
 }
 
