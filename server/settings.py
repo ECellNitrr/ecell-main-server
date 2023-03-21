@@ -100,6 +100,18 @@ if config('DB_TYPE')=='sqlite3':
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
     }
+
+elif config('DB_TYPE')=='psql':
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('PSQL_DATABASE',None),
+        'USER': config('PSQL_USER',None),
+        'PASSWORD': config('PSQL_PASSWORD',None),
+        'HOST': config('DB_HOST','localhost'),
+        'PORT': config('DB_PORT',None),
+    },
+}
 else:
     DATABASES = {
     'default': {
