@@ -42,8 +42,9 @@ urlpatterns = [
     path('core/',include('core.urls'))
 ]
 urlpatterns+=staticfiles_urlpatterns()
+#urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 # for the media urls
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # connecting the react
-urlpatterns.append(re_path('', TemplateView.as_view(template_name="index.html")))
+#urlpatterns.append(re_path('', TemplateView.as_view(template_name="index.html")))
 

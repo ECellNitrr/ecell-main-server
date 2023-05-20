@@ -22,7 +22,7 @@ class Member(models.Model):
         ['design']*2,
         ['none']*2
     ]
-
+    #id = models.AutoField(primary_key=True, default=lambda: 500)
     name = models.CharField(max_length=100)
     profile_url = models.URLField(blank=True, null=True)
     image = models.ImageField(upload_to='static/uploads/team', null=True, blank = True)

@@ -9,3 +9,5 @@ class FullInvestorsAPIView(ModelViewSet):
     serializer_class = InvestorSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_fields = ('year',)
+
+

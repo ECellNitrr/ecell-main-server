@@ -9,6 +9,8 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
    'access',
 ]
 
+#FORCE_SCRIPT_NAME = '/api'
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR,'templates')
@@ -22,7 +24,7 @@ else:
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False #True
 
 ALLOWED_HOSTS = ['*']
 
@@ -159,15 +161,16 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATICFILES_DIRS = ['./templates/']
-STATIC_URL = '/static/'
-STATIC_ROOT = './static'
+STATICFILES_DIRS = [ './ecell/frontend/build/static',]
+STATIC_URL = '/django-static/'
+STATIC_ROOT = 'django-static'
+#django-static
 
 
 MEDIA_URL = '/media/'
@@ -188,7 +191,8 @@ CORS_ALLOW_HEADERS = [
     'access'
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True #False
+CORS_ALLOWED_ORIGINS = ['https://ecell.nitrr.ac.in/',]
 CORS_REPLACE_HTTPS_REFERER = True 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [

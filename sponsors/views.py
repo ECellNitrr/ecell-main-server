@@ -17,24 +17,30 @@ def get_sorted_sponsors(request, year):
 
     spons_categories = []
     res_data = {}
-    for x in spons_types:
-        display_name = spons_types[x]['display_name']
-        res_data[display_name] = list(sorted(
-            [x for x in sponsors_objs.filter(spons_type=x)], 
-            key=lambda x: x.importance, 
-            reverse=True
-            ))
-        res_data[display_name] = [SponsorListSerializer(x).data for x in res_data[display_name]]
-        if not res_data[display_name]:
-            res_data.pop(display_name)
-        else: 
-            spons_categories.append(display_name)
+    Error = 'No Error'
+    try:
+        for x in spons_types:
+            display_name = spons_types[x]['display_name']
+            res_data[display_name] = list(sorted(
+                [x for x in sponsors_objs.filter(spons_type=x)], 
+                key=lambda x: x.importance, 
+                reverse=True
+                ))
+            res_data[display_name] = [SponsorListSerializer(x).data for x in res_data[display_name]]
+            if not res_data[display_name]:
+                res_data.pop(display_name)
+            else: 
+                spons_categories.append(display_name)
+    except Exception as e:
+        Error = f"Error is: {e}"
+        pass 
 
 
     return Response({
         "data": res_data,
         'message': 'fetched successfully',
         'spons_categories': spons_categories,
+        'Error': Error
     }, status=status.HTTP_200_OK)
 
 
